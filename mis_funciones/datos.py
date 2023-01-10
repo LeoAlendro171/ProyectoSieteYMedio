@@ -55,7 +55,7 @@ cartas = {
 # Prioridad Poker - Españolas//Diamantes = oros, corazones = copas, picas = espadas, tréboles = bastos
 
 # Diccionario de jugadores
-players = { "11115555A":
+players = {"11115555A":
 {"name": "Mario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
     ,"cards": [], "roundPoints": 0},
 "22225555A":
