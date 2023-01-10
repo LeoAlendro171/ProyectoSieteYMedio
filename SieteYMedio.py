@@ -32,12 +32,7 @@ while not datos.Salir:
     while datos.flg_01:
         funciones.clear()
         print(datos.titulo_01)
-        textOpts = datos.space + "1)New Human Player" + "\n" + datos.space +"2)New Bot" + \
-                   "\n" + datos.space + "3)Show/Remove Players"+ "\n" + datos.space + "4)Go Back"
-        inputOptText = datos.space + "Option: "
-        option_range = [1,2,3,4]
-        exception = [5]
-        option = funciones.getOpt(textOpts,inputOptText,option_range,exception)
+        funciones.addRemovePlayers()
         if option == 1:
             funciones.clear()
             funciones.setNewPlayer()

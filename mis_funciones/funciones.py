@@ -17,6 +17,15 @@ def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
             print(e)
             input(" "*58+"Press enter to continue")
 
+def addRemovePlayers():
+    textOpts = datos.space + "1)New Human Player" + "\n" + datos.space + "2)New Bot" + \
+               "\n" + datos.space + "3)Show/Remove Players" + "\n" + datos.space + "4)Go Back"
+    inputOptText = datos.space + "Option: "
+    option_range = [1, 2, 3, 4]
+    exception = [5]
+    option = getOpt(textOpts, inputOptText, option_range, exception)
+    return option
+
 def setNewPlayer(human=True):
     while True:
         try:
