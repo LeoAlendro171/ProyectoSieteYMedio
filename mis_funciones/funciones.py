@@ -1,5 +1,4 @@
 from . import datos
-
 def clear():
     print("\033[H\033[J", end="")
 
@@ -28,11 +27,15 @@ def setNewPlayer(human=True):
             if not len(nif) == 9 or not nif[:8].isdigit() or not nif[8].isalpha() \
                or not datos.letrasDni[int(nif[:8])%23] == nif[8].upper():
                 raise ValueError(datos.space + "Wrong NIF")
-            textOps = datos.space+"Select your Profile:\n"
-                                        "1)Cautious\n"
-                                        "2)Moderated\n"
-                                        "3)Bold\n"
-            profile = getOpt()
+            textOps = datos.space+"Select your Profile:\n"+\
+                                        datos.space+"1)Cautious\n"+\
+                                        datos.space+"2)Moderated\n"+\
+                                        datos.space+"3)Bold\n"
+            inputOptText = datos.space+"Option: "
+            option_range = [1,2,3]
+            exception = []
+            option = getOpt(textOps,inputOptText,option_range,exception)
         except ValueError as e:
             print(e)
             input(datos.space+"Enter to continue")
+            clear()

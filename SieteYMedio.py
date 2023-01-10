@@ -4,6 +4,7 @@ from mis_funciones import datos
 
 while not datos.Salir:
     while datos.flg_00:
+        print(datos.titulo_00)
         textOpts = datos.space + "1)Add/Remove/Show Players" + "\n" + datos.space + "2)Settings" + \
                 "\n" + datos.space + "3)Play Game" + "\n" + datos.space + "4)Ranking" + "\n" + datos.space + \
                 "5)Reports" + "\n" + datos.space + "6)Exit"
@@ -30,6 +31,7 @@ while not datos.Salir:
             datos.Salir = True
     while datos.flg_01:
         funciones.clear()
+        print(datos.titulo_01)
         textOpts = datos.space + "1)New Human Player" + "\n" + datos.space +"2)New Bot" + \
                    "\n" + datos.space + "3)Show/Remove Players"+ "\n" + datos.space + "4)Go Back"
         inputOptText = datos.space + "Option: "
@@ -45,6 +47,7 @@ while not datos.Salir:
             datos.flg_00 = True
     while datos.flg_02:
         funciones.clear()
+        print(datos.titulo_02)
         textOpts = datos.space + "1)Set Game Players"+ "\n" + datos.space + "2)Set Card's Deck" + \
                    "\n" + datos.space + "3)Set Max Rounds (Default 5 Rounds)" + "\n" + datos.space + "4)Go Back"
         inputOptText = datos.space + "Option: "
@@ -57,6 +60,7 @@ while not datos.Salir:
             datos.flg_00 = True
     while datos.flg_04:
         funciones.clear()
+        print(datos.titulo_04)
         textOpts = datos.space + "1)Players With More Earnings" + "\n" + datos.space + "2)Players With More Games Played" + \
                    "\n" + datos.space + "3)Players With More Minutes Played" + "\n" + datos.space + "4)Go Back"
         inputOptText = datos.space + "Option: "
@@ -69,6 +73,7 @@ while not datos.Salir:
             datos.flg_00 = True
     while datos.flg_05:
         funciones.clear()
+        print(datos.titulo_05)
         textOpts = datos.space + "1)Initial card more repeated by each user,\n" + datos.space + \
                    "only users who have played a minimum of 3 games"\
                    + "\n" + datos.space + "2)Player who makes the highest bet per game,\n" + datos.space + \
