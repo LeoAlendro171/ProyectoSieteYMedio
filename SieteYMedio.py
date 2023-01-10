@@ -32,7 +32,7 @@ while not datos.Salir:
     while datos.flg_01:
         funciones.clear()
         print(datos.titulo_01)
-        funciones.addRemovePlayers()
+        option = funciones.addRemovePlayers()
         if option == 1:
             funciones.clear()
             funciones.setNewPlayer()
