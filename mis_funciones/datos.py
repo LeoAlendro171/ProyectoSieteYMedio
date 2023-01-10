@@ -54,6 +54,7 @@ cartas = {
 
 # Prioridad Poker - Españolas//Diamantes = oros, corazones = copas, picas = espadas, tréboles = bastos
 
+# Diccionario de jugadores
 players = { "11115555A":
 {"name": "Mario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
     ,"cards": [], "roundPoints": 0},
@@ -62,6 +63,7 @@ players = { "11115555A":
     ,"cards": [], "roundPoints": 0},
 }
 
+# Provisional
 # Lista <game> donde irán los NIF de todos los jugadores que participan en la partida en cada momento
 game = []
 
@@ -70,6 +72,16 @@ mazo = []
 
 # Diccionario donde tendremos una serie de variables de contexto a las que podremos acceder desde cualquier sitio
 context_game = {}
+
+# Diccionarios para las tablas de BBDD que hay que actualizar durante el juego
+cardgame = {"cardgame_id": 0, "players": 0, "start_hour": "hora inicio partida(datetime)", "rounds": 0,
+            "end_hour": "hora final de partida (datetime)"}
+player_game = {"id_game":{"id_player_1":{"initial_card_id": "card id", "starting_points": 0, "ending_points": 0}}}
+player_game_round = {"round": {"id_player_1":{"is_bank": " 0 o 1", "bet_points": "apuesta en la ronda",
+                                              "starting_round_points": "puntos al inicio de partida",
+                                              "cards_value": "puntos obtenidos en la actual ronda",
+                                              "ending_round_points": "puntos al final de la ronda"}}}
+# Provisional
 
 letrasDni = ["T","R","W","A","G","M","Y","F","P","D","X","B","N",
              "J","Z","S","Q","V","H","L","C","K","E"]
