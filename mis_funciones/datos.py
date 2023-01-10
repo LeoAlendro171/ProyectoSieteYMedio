@@ -51,6 +51,26 @@ cartas = {
     "B11": {"literal": "Once de Bastos", "value": 11, "priority": 1, "realValue": 0.5},
     "B12": {"literal": "Doce de Bastos", "value": 12, "priority": 1, "realValue": 0.5},
 }
+
+# Prioridad Poker - Españolas//Diamantes = oros, corazones = copas, picas = espadas, tréboles = bastos
+
+players = { "11115555A":
+{"name": "Mario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
+    ,"cards": [], "roundPoints": 0},
+"22225555A":
+{"name": "Pedro", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
+    ,"cards": [], "roundPoints": 0},
+}
+
+# Lista <game> donde irán los NIF de todos los jugadores que participan en la partida en cada momento
+game = []
+
+# Lista <mazo> donde irán todos los IDs de las cartas que componen el mazo en cada momento
+mazo = []
+
+# Diccionario donde tendremos una serie de variables de contexto a las que podremos acceder desde cualquier sitio
+context_game = {}
+
 letrasDni = ["T","R","W","A","G","M","Y","F","P","D","X","B","N",
              "J","Z","S","Q","V","H","L","C","K","E"]
 
