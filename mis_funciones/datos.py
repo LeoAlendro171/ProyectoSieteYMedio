@@ -63,7 +63,7 @@ players = { "11115555A":
     ,"cards": [], "roundPoints": 0},
 }
 
-# Provisional
+# Provisional///
 # Lista <game> donde irán los NIF de todos los jugadores que participan en la partida en cada momento
 game = []
 
@@ -81,7 +81,7 @@ player_game_round = {"round": {"id_player_1":{"is_bank": " 0 o 1", "bet_points":
                                               "starting_round_points": "puntos al inicio de partida",
                                               "cards_value": "puntos obtenidos en la actual ronda",
                                               "ending_round_points": "puntos al final de la ronda"}}}
-# Provisional
+# ///Provisional
 
 letrasDni = ["T","R","W","A","G","M","Y","F","P","D","X","B","N",
              "J","Z","S","Q","V","H","L","C","K","E"]
