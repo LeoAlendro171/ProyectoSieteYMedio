@@ -182,6 +182,7 @@ Salir = False
 flg_00 = True
 flg_01 = False
 flg_02 = False
+flg_021 = False
 flg_03 = False
 flg_04 = False
 flg_05 = False

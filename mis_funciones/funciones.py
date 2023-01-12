@@ -1,4 +1,9 @@
 from . import datos
+
+def center_string(string, width=140):
+    spaces = (width - len(string)) // 2
+    centered_string = " " * spaces + string + " " * spaces
+    return centered_string
 def clear():
     print("\033[H\033[J", end="")
 
@@ -15,7 +20,7 @@ def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
                 return option
         except ValueError as e:
             print(e)
-            input(" "*58+"Press enter to continue")
+            input("".ljust(58)+"Press enter to continue")
 
 def addRemovePlayers():
     textOpts = datos.space + "1)New Human Player" + "\n" + datos.space + "2)New Bot" + \
@@ -143,17 +148,18 @@ def setPlayersGame():
     elif option == "sh":
         showPlayersGame()
     elif option == "-1":
-        return
+        return option
     else:
-        print("Invalid option")
+        print("Invalid option".center(140,"*"))
+        input(center_string("Enter to continue"))
 
 def showPlayersGame():
     print(datos.titulo_021)
     player_data = ""
     print("Actual players in game".center(140,"*")+"\n")
     if len(datos.game) == 0:
-        print(datos.space+"There are no players in game")
-        input(datos.space+"Enter to continue")
+        print(center_string("There are no players in game"))
+        input(center_string("Enter to continue"))
     else:
         for i in range(len(datos.game)):
             for dni in datos.game[i]:
@@ -170,7 +176,7 @@ def showPlayersGame():
                     player_data += "Bold".ljust(20)
                 player_data += "\n"
         print(player_data)
-        input("".ljust(60)+"Enter to continue")
+        input(center_string("Enter to continue"))
 
 
 

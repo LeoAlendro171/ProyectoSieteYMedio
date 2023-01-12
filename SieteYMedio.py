@@ -53,13 +53,18 @@ while not datos.Salir:
         if option == 1:
             funciones.clear()
             funciones.showPlayersGame()
-            funciones.clear()
-            funciones.setPlayersGame()
+            datos.flg_02 = False
+            datos.flg_021 = True
         elif option == 4:
             funciones.clear()
             datos.flg_02 = False
             datos.flg_00 = True
-
+    while datos.flg_021:
+        funciones.clear()
+        option = funciones.setPlayersGame()
+        if option == "-1":
+            datos.flg_021 = False
+            datos.flg_02 = True
     while datos.flg_04:
         funciones.clear()
         print(datos.titulo_04)
