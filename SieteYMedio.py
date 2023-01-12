@@ -19,7 +19,13 @@ while not datos.Salir:
             datos.flg_00 = False
             datos.flg_02 = True
         elif option == 3:
-            print("Hola")
+            if len(datos.game) == 0:
+                print(datos.space + "Set the players that compose the game first")
+                input(datos.space + "Enter to continue")
+                funciones.clear()
+            else:
+                datos.flg_00 = False
+                datos.flg_03 = True
         elif option == 4:
             datos.flg_00 = False
             datos.flg_04 = True
@@ -43,16 +49,15 @@ while not datos.Salir:
     while datos.flg_02:
         funciones.clear()
         print(datos.titulo_02)
-        textOpts = datos.space + "1)Set Game Players"+ "\n" + datos.space + "2)Set Card's Deck" + \
-                   "\n" + datos.space + "3)Set Max Rounds (Default 5 Rounds)" + "\n" + datos.space + "4)Go Back"
-        inputOptText = datos.space + "Option: "
-        option_range = [1,2,3,4]
-        exception = [5]
-        option = funciones.getOpt(textOpts,inputOptText,option_range,exception)
-        if option == 4:
+        option = funciones.settings()
+        if option == 1:
+            funciones.clear()
+            funciones.setPlayersGame()
+        elif option == 4:
             funciones.clear()
             datos.flg_02 = False
             datos.flg_00 = True
+
     while datos.flg_04:
         funciones.clear()
         print(datos.titulo_04)

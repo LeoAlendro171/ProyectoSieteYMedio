@@ -60,3 +60,69 @@ def setNewPlayer(human = True):
             input(datos.space+"Enter to continue")
             clear()
 
+def settings():
+    textOpts = datos.space + "1)Set Game Players" + "\n" + datos.space + "2)Set Card's Deck" + \
+               "\n" + datos.space + "3)Set Max Rounds (Default 5 Rounds)" + "\n" + datos.space + "4)Go Back"
+    inputOptText = datos.space + "Option: "
+    option_range = [1, 2, 3, 4]
+    exception = [5]
+    option = getOpt(textOpts, inputOptText, option_range, exception)
+    if option == 1:
+        print("Actual players in game".center(140,"*"))
+        if len(datos.game) == 0:
+            print(datos.space+"There are no players in game")
+            input(datos.space+"Enter to continue")
+        return option
+    elif option == 4:
+        return option
+
+
+def setPlayersGame():
+    print("Select players".center(140, "*"))
+    print("Bot Players".center(70)+"Human Players".center(70)+"\n"+"-"*140)
+    players_data = ""
+    bot_players = []
+    human_players = []
+    header = ("ID".ljust(20) + "Name".ljust(20) + "Type".ljust(20)).ljust(64) + "|".ljust(4)+\
+             ("ID".ljust(20) + "Name".ljust(20) + "Type".ljust(20) + "\n" + "*" * 140).ljust(70)
+    print(header)
+    for dni in datos.players:
+        player = datos.players[dni]
+        if player["human"]:
+            human_players.append({"dni": dni, "name": player["name"], "type": player["type"]})
+        else:
+            bot_players.append({"dni": dni, "name": player["name"], "type": player["type"]})
+    if len(human_players) > len(bot_players):
+        max_list = human_players
+    else:
+        max_list = bot_players
+    for i in range(len(max_list)):
+        if i < len(bot_players):
+            players_data += bot_players[i]["dni"].ljust(20) + bot_players[i]['name'].ljust(20)
+            if bot_players[i]["type"] == 30:
+                players_data += "Cautious".ljust(20)
+            elif bot_players[i]["type"] == 40:
+                players_data += "Moderated".ljust(20)
+            elif bot_players[i]["type"] == 50:
+                players_data += "Bold".ljust(20)
+        else:
+            players_data += "".ljust(20) + "".ljust(20) + "".ljust(20)
+        players_data += "\t|\t"
+        if i < len(human_players):
+            players_data += human_players[i]["dni"].ljust(20) + human_players[i]['name'].ljust(20)
+            if human_players[i]["type"] == 30:
+                players_data += "Cautious".ljust(20)
+            elif human_players[i]["type"] == 40:
+                players_data += "Moderated".ljust(20)
+            elif human_players[i]["type"] == 50:
+                players_data += "Bold".ljust(20)
+            else:
+                players_data += "".ljust(20) + "".ljust(20) + "".ljust(20)
+        players_data += "\n"
+    print(players_data)
+    input("Enter to continue")
+
+
+
+
+

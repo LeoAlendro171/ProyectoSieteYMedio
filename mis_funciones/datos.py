@@ -61,6 +61,24 @@ players = {"11115555A":
 "22225555A":
 {"name": "Pedro", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
     ,"cards": [], "roundPoints": 0},
+"99999999A":
+{"name": "Alex", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
+ , "cards": [], "roundPoints": 0},
+"88888888X":
+{"name": "Pepe", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+ "cards": [], "roundPoints": 0},
+"77777777N":
+{"name": "Dario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+ "cards": [], "roundPoints": 0},
+"10101010F":
+{"name": "Julia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+ "cards": [], "roundPoints": 0},
+"11111111E":
+{"name": "Silvia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+ "cards": [], "roundPoints": 0},
+"22222222D":
+{"name": "Carlos", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+ "cards": [], "roundPoints": 0}
 }
 
 # Provisional///
@@ -71,13 +89,13 @@ game = []
 mazo = []
 
 # Diccionario donde tendremos una serie de variables de contexto a las que podremos acceder desde cualquier sitio
-context_game = {}
+context_game = {"game_players": game}
 
 # Diccionarios para las tablas de BBDD que hay que actualizar durante el juego
 cardgame = {"cardgame_id": 0, "players": 0, "start_hour": "hora inicio partida(datetime)", "rounds": 0,
             "end_hour": "hora final de partida (datetime)"}
 player_game = {"id_game":{"id_player_1":{"initial_card_id": "card id", "starting_points": 0, "ending_points": 0}}}
-player_game_round = {"round": {"id_player_1":{"is_bank": " 0 o 1", "bet_points": "apuesta en la ronda",
+player_game_round = {"id_round": {"id_player_1":{"is_bank": " 0 o 1", "bet_points": "apuesta en la ronda",
                                               "starting_round_points": "puntos al inicio de partida",
                                               "cards_value": "puntos obtenidos en la actual ronda",
                                               "ending_round_points": "puntos al final de la ronda"}}}
@@ -153,5 +171,6 @@ Salir = False
 flg_00 = True
 flg_01 = False
 flg_02 = False
+flg_03 = False
 flg_04 = False
 flg_05 = False
