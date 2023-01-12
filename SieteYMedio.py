@@ -52,6 +52,8 @@ while not datos.Salir:
         option = funciones.settings()
         if option == 1:
             funciones.clear()
+            funciones.showPlayersGame()
+            funciones.clear()
             funciones.setPlayersGame()
         elif option == 4:
             funciones.clear()

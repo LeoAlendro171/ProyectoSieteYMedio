@@ -68,16 +68,13 @@ def settings():
     exception = [5]
     option = getOpt(textOpts, inputOptText, option_range, exception)
     if option == 1:
-        print("Actual players in game".center(140,"*"))
-        if len(datos.game) == 0:
-            print(datos.space+"There are no players in game")
-            input(datos.space+"Enter to continue")
         return option
     elif option == 4:
         return option
 
 
 def setPlayersGame():
+    print(datos.titulo_021)
     print("Select players".center(140, "*"))
     print("Bot Players".center(70)+"Human Players".center(70)+"\n"+"-"*140)
     players_data = ""
@@ -120,7 +117,64 @@ def setPlayersGame():
                 players_data += "".ljust(20) + "".ljust(20) + "".ljust(20)
         players_data += "\n"
     print(players_data)
-    input("Enter to continue")
+    # Provisional ////
+    # text = datos.space+"Enter ID to add a player to the game\n"+\
+    #       datos.space+"Enter -ID to remove a player from the game\n"+\
+    #       datos.space+"Enter sh to show actual players in game\n"+\
+    #       datos.space+"Enter -1 to exit\n"
+    # option_text = datos.space + "Option: "
+    # option_range = [datos.players]
+    # //// Provisional
+    option = input(datos.space+"Enter ID to add a player to the game\n"+\
+          datos.space+"Enter -ID to remove a player from the game\n"+\
+          datos.space+"Enter sh to show actual players in game\n"+\
+          datos.space+"Enter -1 to exit\n"+\
+          datos.space+"Option: ")
+    if len(option) == 9 and option[:8].isdigit() and option[8].upper().isalpha() \
+            and option.upper() in datos.players and {option.upper():datos.players[option.upper()]} not in datos.game:
+        datos.game.append({option.upper():datos.players[option.upper()]})
+        # borrar este print
+        print(datos.game)
+    elif len(option) == 10 and option[1:9].isdigit() and option[0] == "-" and option[9].upper().isalpha() \
+            and option[1:10].upper() in datos.players:
+        datos.game.remove({option.lstrip("-").upper():datos.players[option.lstrip("-").upper()]})
+        # borrar este print
+        print(datos.game)
+    elif option == "sh":
+        showPlayersGame()
+    elif option == "-1":
+        return
+    else:
+        print("Invalid option")
+
+def showPlayersGame():
+    print(datos.titulo_021)
+    player_data = ""
+    print("Actual players in game".center(140,"*")+"\n")
+    if len(datos.game) == 0:
+        print(datos.space+"There are no players in game")
+        input(datos.space+"Enter to continue")
+    else:
+        for i in range(len(datos.game)):
+            for dni in datos.game[i]:
+                player_data += "".ljust(40)+dni.ljust(20) + datos.game[i][dni]["name"].ljust(20)
+                if datos.game[i][dni]["human"]:
+                    player_data += "Human".ljust(20)
+                else:
+                    player_data += "Bot".ljust(20)
+                if datos.game[i][dni]["type"] == 30:
+                    player_data += "Cautious".ljust(20)
+                elif datos.game[i][dni]["type"] == 40:
+                    player_data += "Moderated".ljust(20)
+                elif datos.game[i][dni]["type"] == 50:
+                    player_data += "Bold".ljust(20)
+                player_data += "\n"
+        print(player_data)
+        input("".ljust(60)+"Enter to continue")
+
+
+
+
 
 
 
