@@ -5,6 +5,8 @@ def center_string(string, width=140):
     spaces = (width - len(string)) // 2
     centered_string = " " * spaces + string + " " * spaces
     return centered_string
+
+
 def clear():
     print("\033[H\033[J", end="")
 
@@ -14,16 +16,36 @@ def clear():
 
 def setGamePriority(mazo):
     random.shuffle(mazo)
-    for i in range(len(datos.game)):
-        datos.players[datos.game[i]]["priority"] = i+1
-        maxim = datos.players[datos.game[i]]["priority"]
     for dni in datos.game:
         # cambiar como se gestiona la prioridad mas adelante
         datos.players[dni]["cards"].append(mazo[0])
+        datos.players[dni]["initialCard"] += mazo[0]
+        datos.players[dni]["roundPoints"] = datos.cartas[mazo[0]]["realValue"]
         mazo.remove(mazo[0])
-        if datos.players[dni]["priority"] == maxim:
-            datos.players[dni]["bank"] = True
-        print(datos.players[dni])
+    for i in range(len(datos.game)-1):
+        for j in range(len(datos.game)-i-1):
+            if datos.players[datos.game[j]]["roundPoints"] == datos.players[datos.game[j+1]]["roundPoints"]:
+                if datos.cartas[datos.players[datos.game[j]]["initialCard"]]["priority"] > \
+                        datos.cartas[datos.players[datos.game[j+1]]["initialCard"]]["priority"]\
+                        and datos.cartas[datos.players[datos.game[j]]["initialCard"]]["value"] > \
+                        datos.cartas[datos.players[datos.game[j+1]]["initialCard"]]["value"]:
+                    aux = datos.game[j]
+                    datos.game[j] = datos.game[j+1]
+                    datos.game[j+1] = aux
+                elif datos.cartas[datos.players[datos.game[j]]["initialCard"]]["priority"] > \
+                        datos.cartas[datos.players[datos.game[j+1]]["initialCard"]]["priority"]:
+                    aux = datos.game[j]
+                    datos.game[j] = datos.game[j+1]
+                    datos.game[j+1] = aux
+            elif datos.players[datos.game[j]]["roundPoints"] > datos.players[datos.game[j+1]]["roundPoints"]:
+                aux = datos.game[j]
+                datos.game[j] = datos.game[j+1]
+                datos.game[j+1] = aux
+    for i in range(len(datos.game)):
+        datos.players[datos.game[i]]["priority"] = i + 1
+        if datos.players[datos.game[i]]["priority"] == len(datos.game):
+            datos.players[datos.game[i]]["bank"] = True
+        print(datos.players[datos.game[i]])
 
 def resetPoints():
     for dni in datos.game:
