@@ -1,4 +1,5 @@
 from . import datos
+import random
 
 def center_string(string, width=140):
     spaces = (width - len(string)) // 2
@@ -6,6 +7,48 @@ def center_string(string, width=140):
     return centered_string
 def clear():
     print("\033[H\033[J", end="")
+
+
+# def playGame():
+#     while datos.game_round <= datos.maxRounds:
+
+def setGamePriority(mazo):
+    random.shuffle(mazo)
+    for i in range(len(datos.game)):
+        datos.players[datos.game[i]]["priority"] = i+1
+        maxim = datos.players[datos.game[i]]["priority"]
+    for dni in datos.game:
+        # cambiar como se gestiona la prioridad mas adelante
+        datos.players[dni]["cards"].append(mazo[0])
+        mazo.remove(mazo[0])
+        if datos.players[dni]["priority"] == maxim:
+            datos.players[dni]["bank"] = True
+        print(datos.players[dni])
+
+def resetPoints():
+    for dni in datos.game:
+        datos.players[dni]["points"] = 20
+
+def checkMinimum2PlayersWithPoints():
+    two_players = len(datos.game)
+    for dni in datos.game:
+        if datos.players[dni]["points"] == 0:
+            two_players -= 1
+    if two_players < 2:
+        print("Not enough players with points")
+
+def orderAllPlayers():
+    # preguntar al Jordi sobre esta funcion
+    for i in range(len(datos.game)-1):
+        for j in range(len(datos.game)-i-1):
+            if datos.players[datos.game[j]]["priority"] < datos.players[datos.game[j+1]]["priority"]:
+                aux = datos.game[j]
+                datos.game[j] = datos.game[j+1]
+                datos.game[j+1] = aux
+
+def setBets():
+    # preguntar como funciona esto
+    print("Hola")
 
 def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
     print(textOpts)
@@ -70,12 +113,9 @@ def settings():
                "\n" + datos.space + "3)Set Max Rounds (Default 5 Rounds)" + "\n" + datos.space + "4)Go Back"
     inputOptText = datos.space + "Option: "
     option_range = [1, 2, 3, 4]
-    exception = [5]
+    exception = []
     option = getOpt(textOpts, inputOptText, option_range, exception)
-    if option == 1:
-        return option
-    elif option == 4:
-        return option
+    return option
 
 
 def setPlayersGame():
@@ -137,14 +177,16 @@ def setPlayersGame():
           datos.space+"Option: ")
     if len(option) == 9 and option[:8].isdigit() and option[8].upper().isalpha() \
             and option.upper() in datos.players and {option.upper():datos.players[option.upper()]} not in datos.game:
-        datos.game.append({option.upper():datos.players[option.upper()]})
-        # borrar este print
-        print(datos.game)
+        if len(datos.game) <= 5:
+            datos.game.append(option.upper())
+            showPlayersGame()
+        else:
+            print(center_string("-Max number of players exceeded-"))
+            input(center_string("Enter to continue"))
     elif len(option) == 10 and option[1:9].isdigit() and option[0] == "-" and option[9].upper().isalpha() \
             and option[1:10].upper() in datos.players:
-        datos.game.remove({option.lstrip("-").upper():datos.players[option.lstrip("-").upper()]})
-        # borrar este print
-        print(datos.game)
+        datos.game.remove(option.lstrip("-").upper())
+        showPlayersGame()
     elif option == "sh":
         showPlayersGame()
     elif option == "-1":
@@ -154,29 +196,49 @@ def setPlayersGame():
         input(center_string("Enter to continue"))
 
 def showPlayersGame():
-    print(datos.titulo_021)
     player_data = ""
     print("Actual players in game".center(140,"*")+"\n")
     if len(datos.game) == 0:
         print(center_string("There are no players in game"))
         input(center_string("Enter to continue"))
     else:
-        for i in range(len(datos.game)):
-            for dni in datos.game[i]:
-                player_data += "".ljust(40)+dni.ljust(20) + datos.game[i][dni]["name"].ljust(20)
-                if datos.game[i][dni]["human"]:
-                    player_data += "Human".ljust(20)
-                else:
-                    player_data += "Bot".ljust(20)
-                if datos.game[i][dni]["type"] == 30:
-                    player_data += "Cautious".ljust(20)
-                elif datos.game[i][dni]["type"] == 40:
-                    player_data += "Moderated".ljust(20)
-                elif datos.game[i][dni]["type"] == 50:
-                    player_data += "Bold".ljust(20)
-                player_data += "\n"
+        for dni in datos.game:
+            player_data += "".ljust(40)+dni.ljust(20) + datos.players[dni]["name"].ljust(20)
+            if datos.players[dni]["human"]:
+                player_data += "Human".ljust(20)
+            else:
+                player_data += "Bot".ljust(20)
+            if datos.players[dni]["type"] == 30:
+                player_data += "Cautious".ljust(20)
+            elif datos.players[dni]["type"] == 40:
+                player_data += "Moderated".ljust(20)
+            elif datos.players[dni]["type"] == 50:
+                player_data += "Bold".ljust(20)
+            player_data += "\n"
         print(player_data)
         input(center_string("Enter to continue"))
+
+def setMaxRounds():
+    while True:
+        try:
+            datos.maxRounds = input(center_string("Max Rounds: "))
+            if not datos.maxRounds.lstrip("-").isdigit():
+                raise ValueError(center_string("Please, enter a number"))
+            elif int(datos.maxRounds) < 1:
+                raise ValueError(center_string("Please, enter a valid number of rounds"))
+            else:
+                datos.maxRounds = int(datos.maxRounds)
+                print(center_string("Rounds set to {}".format(datos.maxRounds)))
+                return datos.maxRounds
+        except ValueError as e:
+            print(e)
+            input(center_string("Enter to continue"))
+
+def setCardsDeck():
+    for ids in datos.cartas:
+        datos.mazo += [ids]
+    return datos.mazo
+
 
 
 

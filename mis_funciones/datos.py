@@ -83,7 +83,10 @@ players = {"11115555A":
 
 # Provisional///
 # Lista <game> donde irán los NIF de todos los jugadores que participan en la partida en cada momento
-game = []
+game = ["99999999A",
+        "88888888X",
+        "22222222D",
+        "11111111E"]
 
 # Lista <mazo> donde irán todos los IDs de las cartas que componen el mazo en cada momento
 mazo = []
@@ -176,13 +179,15 @@ titulo_021 = "*"*140+"""
                                                                                             __/ |                 
                                                                                            |___/"""+"\n"+"*"*140+"\n"
 space = " "*45
-
+maxRounds = 5
+game_round = 0
 
 Salir = False
 flg_00 = True
 flg_01 = False
 flg_02 = False
 flg_021 = False
+flg_023 = False
 flg_03 = False
 flg_04 = False
 flg_05 = False
