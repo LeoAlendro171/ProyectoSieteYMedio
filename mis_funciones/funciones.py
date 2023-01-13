@@ -11,14 +11,20 @@ def clear():
     print("\033[H\033[J", end="")
 
 
-# def playGame():
-#     while datos.game_round <= datos.maxRounds:
+def playGame():
+    setCardsDeck()
+    setGamePriority(datos.mazo)
+    resetPoints()
+    checkMinimum2PlayersWithPoints()
+    orderAllPlayers()
+    setBets()
+    for dni in datos.game:
+        standardRound(dni, datos.mazo)
+    distributionPointAndNewBankCandidates()
 
 def setGamePriority(mazo):
     random.shuffle(mazo)
     for dni in datos.game:
-        # cambiar como se gestiona la prioridad mas adelante
-        datos.players[dni]["cards"].append(mazo[0])
         datos.players[dni]["initialCard"] += mazo[0]
         datos.players[dni]["roundPoints"] = datos.cartas[mazo[0]]["realValue"]
         mazo.remove(mazo[0])
@@ -46,6 +52,7 @@ def setGamePriority(mazo):
         if datos.players[datos.game[i]]["priority"] == len(datos.game):
             datos.players[datos.game[i]]["bank"] = True
         print(datos.players[datos.game[i]])
+        datos.players[datos.game[i]]["roundPoints"] = 0
 
 def resetPoints():
     for dni in datos.game:
@@ -69,9 +76,15 @@ def orderAllPlayers():
                 datos.game[j+1] = aux
 
 def setBets():
-    # preguntar como funciona esto
-    print("Hola")
-
+    for dni in datos.game:
+        datos.players[dni]["bet"] = 0
+        if datos.players[dni]["type"] == 30:
+            datos.players[dni]["bet"] = datos.players[dni]["points"] * 0.3
+        elif datos.players[dni]["type"] == 40:
+            datos.players[dni]["bet"] = datos.players[dni]["points"] * 0.4
+        elif datos.players[dni]["type"] == 50:
+            datos.players[dni]["bet"] = datos.players[dni]["points"] * 0.5
+        print(datos.players[dni])
 def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
     print(textOpts)
     while True:
@@ -86,6 +99,62 @@ def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
         except ValueError as e:
             print(e)
             input("".ljust(58)+"Press enter to continue")
+
+
+def standardRound(id,mazo):
+    datos.players[id]["cards"].append(mazo[0])
+    print("Player {} draws {}!".format(datos.players[id]["name"],mazo[0]))
+    datos.players[id]["roundPoints"] += datos.cartas[mazo[0]]["realValue"]
+    mazo.remove(mazo[0])
+    print(datos.players[id])
+    if datos.players[id]["roundPoints"] == 7.5:
+        input(center_string("Enter to continue"))
+        return
+    elif datos.players[id]["roundPoints"] != 7.5:
+        bad_cards = 0
+        normal_cards = 0
+        plantarse = 0
+        for cards in mazo:
+            # print("Esto son las cartas",cards)
+            if datos.players[id]["roundPoints"] + datos.cartas[cards]["realValue"] > 7.5:
+                # print("Esto son las cartas que suman mas de 7.5",cards)
+                bad_cards += 1
+            else:
+                normal_cards += 1
+            # print("Esto es normal cards",normal_cards)
+            # print("Esto es bad cards",bad_cards)
+        if bad_cards > 0 and normal_cards > 0:
+            plantarse = bad_cards / normal_cards * 100
+            print("Esto es plantarse",plantarse)
+        if plantarse > datos.players[id]["type"] or datos.players[id]["roundPoints"] > 7.5:
+            input(center_string("Enter to continue"))
+            return
+        elif datos.players[id]["roundPoints"] < 7.5:
+            standardRound(id,mazo)
+
+
+def distributionPointAndNewBankCandidates():
+    ordered_players = []
+    candidates = []
+    for i in range(len(datos.game)):
+        if datos.players[datos.game[i]]["roundPoints"] == 7.5 and datos.players[datos.game[i]]["bank"]:
+            print("Gana la banca")
+            break
+        elif datos.players[datos.game[i]]["roundPoints"] == 7.5 and not datos.players[datos.game[i]]["bank"]:
+            candidates.append(datos.players[datos.game[i]])
+            print(candidates)
+            for j in range(len(datos.game)-1):
+                for k in range(len(datos.game)-j-1):
+                    if datos.players[datos.game[k]]["priority"] < datos.players[datos.game[k+1]]["priority"]:
+                        candidates.remove(datos.players[datos.game[k]])
+        elif datos.players[datos.game[i]]["roundPoints"] < 7.5:
+            for j in range(len(datos.game) - 1):
+                for k in range(len(datos.game) - j - 1):
+                    if datos.players[datos.game[k]]["roundPoints"] > datos.players[datos.game[k]]["roundpoints"]:
+                        print("hola")
+                    if datos.players[datos.game[k]]["priority"] < datos.players[datos.game[k + 1]]["priority"]:
+                        candidates.remove(datos.players[datos.game[k]])
+
 
 def addRemovePlayers():
     textOpts = datos.space + "1)New Human Player" + "\n" + datos.space + "2)New Bot" + \

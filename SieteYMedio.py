@@ -27,10 +27,7 @@ while not datos.Salir:
                 print(funciones.center_string("Please, set the number of rounds first"))
             else:
                 funciones.setCardsDeck()
-                funciones.setGamePriority(datos.mazo)
-                funciones.resetPoints()
-                funciones.checkMinimum2PlayersWithPoints()
-                funciones.orderAllPlayers()
+                funciones.playGame()
                 datos.flg_00 = False
                 datos.flg_03 = True
         elif option == 4:

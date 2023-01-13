@@ -56,28 +56,28 @@ cartas = {
 
 # Diccionario de jugadores
 players = {"11115555A":
-{"name": "Mario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
+{"name": "Mario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 0, "points": 0
     ,"cards": [], "roundPoints": 0},
 "22225555A":
-{"name": "Pedro", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
+{"name": "Pedro", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 0, "points": 0
     ,"cards": [], "roundPoints": 0},
 "99999999A":
-{"name": "Alex", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 4, "points": 0
+{"name": "Alex", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 30, "bet": 0, "points": 0
  , "cards": [], "roundPoints": 0},
 "88888888X":
-{"name": "Pepe", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+{"name": "Pepe", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
  "cards": [], "roundPoints": 0},
 "77777777N":
-{"name": "Dario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+{"name": "Dario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
  "cards": [], "roundPoints": 0},
 "10101010F":
-{"name": "Julia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+{"name": "Julia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
  "cards": [], "roundPoints": 0},
 "11111111E":
-{"name": "Silvia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+{"name": "Silvia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 0, "points": 0,
  "cards": [], "roundPoints": 0},
 "22222222D":
-{"name": "Carlos", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 4, "points": 0,
+{"name": "Carlos", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
  "cards": [], "roundPoints": 0}
 }
 
