@@ -181,6 +181,8 @@ titulo_021 = "*"*140+"""
 space = " "*45
 maxRounds = 5
 game_round = 0
+ronda = 0
+eliminadas = []
 
 Salir = False
 flg_00 = True

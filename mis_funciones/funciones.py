@@ -12,22 +12,28 @@ def clear():
 
 
 def playGame():
-    setCardsDeck()
     setGamePriority(datos.mazo)
     resetPoints()
     checkMinimum2PlayersWithPoints()
     orderAllPlayers()
     setBets()
-    for dni in datos.game:
-        standardRound(dni, datos.mazo)
-    distributionPointAndNewBankCandidates()
+    for i in range(datos.maxRounds):
+        for dni in datos.game:
+            standardRound(dni, datos.mazo)
+        distributionPointAndNewBankCandidates()
+        datos.maxRounds -= 1
 
 def setGamePriority(mazo):
     random.shuffle(mazo)
+    datos.eliminadas = []
     for dni in datos.game:
         datos.players[dni]["initialCard"] += mazo[0]
         datos.players[dni]["roundPoints"] = datos.cartas[mazo[0]]["realValue"]
+        datos.eliminadas.append(mazo[0])
         mazo.remove(mazo[0])
+    for cards in datos.cartas:
+        if cards not in mazo:
+            mazo.append(cards)
     for i in range(len(datos.game)-1):
         for j in range(len(datos.game)-i-1):
             if datos.players[datos.game[j]]["roundPoints"] == datos.players[datos.game[j+1]]["roundPoints"]:
@@ -53,6 +59,7 @@ def setGamePriority(mazo):
             datos.players[datos.game[i]]["bank"] = True
         print(datos.players[datos.game[i]])
         datos.players[datos.game[i]]["roundPoints"] = 0
+        random.shuffle(mazo)
 
 def resetPoints():
     for dni in datos.game:
@@ -102,9 +109,11 @@ def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
 
 
 def standardRound(id,mazo):
+    print(center_string("Ronda {}".format(datos.ronda)))
     datos.players[id]["cards"].append(mazo[0])
     print("Player {} draws {}!".format(datos.players[id]["name"],mazo[0]))
     datos.players[id]["roundPoints"] += datos.cartas[mazo[0]]["realValue"]
+    datos.eliminadas.append(mazo[0])
     mazo.remove(mazo[0])
     print(datos.players[id])
     if datos.players[id]["roundPoints"] == 7.5:
@@ -112,20 +121,16 @@ def standardRound(id,mazo):
         return
     elif datos.players[id]["roundPoints"] != 7.5:
         bad_cards = 0
-        normal_cards = 0
         plantarse = 0
         for cards in mazo:
             # print("Esto son las cartas",cards)
             if datos.players[id]["roundPoints"] + datos.cartas[cards]["realValue"] > 7.5:
                 # print("Esto son las cartas que suman mas de 7.5",cards)
                 bad_cards += 1
-            else:
-                normal_cards += 1
             # print("Esto es normal cards",normal_cards)
             # print("Esto es bad cards",bad_cards)
-        if bad_cards > 0 and normal_cards > 0:
-            plantarse = bad_cards / normal_cards * 100
-            print("Esto es plantarse",plantarse)
+        if bad_cards > 0:
+            plantarse = (bad_cards / len(mazo)) * 100
         if plantarse > datos.players[id]["type"] or datos.players[id]["roundPoints"] > 7.5:
             input(center_string("Enter to continue"))
             return
@@ -134,26 +139,65 @@ def standardRound(id,mazo):
 
 
 def distributionPointAndNewBankCandidates():
-    ordered_players = []
+    for cards in datos.eliminadas:
+        if cards not in datos.mazo:
+            datos.mazo.append(cards)
+    random.shuffle(datos.mazo)
     candidates = []
-    for i in range(len(datos.game)):
-        if datos.players[datos.game[i]]["roundPoints"] == 7.5 and datos.players[datos.game[i]]["bank"]:
-            print("Gana la banca")
-            break
-        elif datos.players[datos.game[i]]["roundPoints"] == 7.5 and not datos.players[datos.game[i]]["bank"]:
-            candidates.append(datos.players[datos.game[i]])
-            print(candidates)
-            for j in range(len(datos.game)-1):
-                for k in range(len(datos.game)-j-1):
-                    if datos.players[datos.game[k]]["priority"] < datos.players[datos.game[k+1]]["priority"]:
-                        candidates.remove(datos.players[datos.game[k]])
-        elif datos.players[datos.game[i]]["roundPoints"] < 7.5:
-            for j in range(len(datos.game) - 1):
-                for k in range(len(datos.game) - j - 1):
-                    if datos.players[datos.game[k]]["roundPoints"] > datos.players[datos.game[k]]["roundpoints"]:
-                        print("hola")
-                    if datos.players[datos.game[k]]["priority"] < datos.players[datos.game[k + 1]]["priority"]:
-                        candidates.remove(datos.players[datos.game[k]])
+    draw = []
+    winner = ""
+    round_winner = False
+    if not round_winner:
+        for dni in datos.game:
+            if datos.players[dni]["roundPoints"] == 7.5:
+                if datos.players[dni]["bank"]:
+                    candidates.append(dni)
+                    round_winner = True
+                elif not datos.players[dni]["bank"]:
+                    candidates.append(dni)
+            elif datos.players[dni]["roundPoints"] < 7.5:
+                candidates.append(dni)
+            elif datos.players[dni]["roundPoints"] > 7.5:
+                draw.append(dni)
+                if len(draw) == len(datos.game):
+                    print(center_string("Ronda invalida"))
+                    standardRound(datos.game,datos.mazo)
+        for i in range(len(candidates)-1):
+            for j in range(len(candidates)-i-1):
+                if datos.players[candidates[j]]["roundPoints"] < datos.players[candidates[j+1]]["roundPoints"]:
+                    aux = candidates[j]
+                    candidates[j] = candidates[j+1]
+                    candidates[j+1] = aux
+                    round_winner = True
+                elif datos.players[candidates[j]]["roundPoints"] == datos.players[candidates[j+1]]["roundPoints"]:
+                    if datos.players[candidates[j]]["priority"] < datos.players[candidates[j + 1]]["priority"]:
+                        aux = candidates[j]
+                        candidates[j] = candidates[j + 1]
+                        candidates[j + 1] = aux
+                        round_winner = True
+    winner = candidates[0]
+    print("Gana {}".format(winner))
+    winner_points = 0
+    for dni in datos.game:
+        datos.players[dni]["cards"] = []
+        if dni not in winner:
+            winner_points += datos.players[dni]["bet"]
+            datos.players[dni]["points"] -= datos.players[dni]["bet"]
+            print(winner_points)
+            print(datos.players[dni])
+        if datos.players[dni]["points"] <= 0:
+            print("Este se tiene que ir a la mierda",datos.players[dni])
+            datos.game.remove(dni)
+        if datos.players[winner]["roundPoints"] == 7.5:
+            datos.players[bank_player]["priority"] = datos.players[winner]["priority"]
+            datos.players[winner]["bank"] = True
+            datos.players[winner]["priority"] = len(datos.game)
+        datos.players[dni]["roundPoints"] = 0
+    datos.players[winner]["points"] += winner_points
+    datos.ronda += 1
+    print(datos.players[winner])
+    input(center_string("Enter to continue"))
+
 
 
 def addRemovePlayers():
