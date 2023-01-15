@@ -183,6 +183,7 @@ maxRounds = 5
 game_round = 0
 ronda = 0
 eliminadas = []
+bank_player = ""
 
 Salir = False
 flg_00 = True

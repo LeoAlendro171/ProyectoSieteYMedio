@@ -16,11 +16,12 @@ def playGame():
     resetPoints()
     checkMinimum2PlayersWithPoints()
     orderAllPlayers()
-    setBets()
     for i in range(datos.maxRounds):
         for dni in datos.game:
+            setBets()
             standardRound(dni, datos.mazo)
         distributionPointAndNewBankCandidates()
+        orderAllPlayers()
         datos.maxRounds -= 1
 
 def setGamePriority(mazo):
@@ -77,7 +78,7 @@ def orderAllPlayers():
     # preguntar al Jordi sobre esta funcion
     for i in range(len(datos.game)-1):
         for j in range(len(datos.game)-i-1):
-            if datos.players[datos.game[j]]["priority"] < datos.players[datos.game[j+1]]["priority"]:
+            if datos.players[datos.game[j]]["priority"] > datos.players[datos.game[j+1]]["priority"]:
                 aux = datos.game[j]
                 datos.game[j] = datos.game[j+1]
                 datos.game[j+1] = aux
@@ -86,12 +87,13 @@ def setBets():
     for dni in datos.game:
         datos.players[dni]["bet"] = 0
         if datos.players[dni]["type"] == 30:
-            datos.players[dni]["bet"] = datos.players[dni]["points"] * 0.3
+            datos.players[dni]["bet"] = int(datos.players[dni]["points"] * 0.3)
         elif datos.players[dni]["type"] == 40:
-            datos.players[dni]["bet"] = datos.players[dni]["points"] * 0.4
+            datos.players[dni]["bet"] = int(datos.players[dni]["points"] * 0.4)
         elif datos.players[dni]["type"] == 50:
-            datos.players[dni]["bet"] = datos.players[dni]["points"] * 0.5
-        print(datos.players[dni])
+            datos.players[dni]["bet"] = int(datos.players[dni]["points"] * 0.5)
+        elif datos.players[dni]["points"] == 1 or datos.players[dni]["points"] == 2:
+            datos.players[dni]["bet"] = 1
 def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
     print(textOpts)
     while True:
@@ -109,6 +111,8 @@ def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
 
 
 def standardRound(id,mazo):
+    if datos.players[id]["bank"]:
+        datos.bank_player = id
     print(center_string("Ronda {}".format(datos.ronda)))
     datos.players[id]["cards"].append(mazo[0])
     print("Player {} draws {}!".format(datos.players[id]["name"],mazo[0]))
@@ -179,23 +183,40 @@ def distributionPointAndNewBankCandidates():
     print("Gana {}".format(winner))
     winner_points = 0
     for dni in datos.game:
-        datos.players[dni]["cards"] = []
         if dni not in winner:
-            winner_points += datos.players[dni]["bet"]
-            datos.players[dni]["points"] -= datos.players[dni]["bet"]
-            print(winner_points)
-            print(datos.players[dni])
+            if datos.players[dni]["bank"]:
+                for i in range(len(datos.game)):
+                    if datos.players[datos.bank_player]["roundPoints"] < datos.players[datos.game[i]]["roundPoints"] and\
+                        datos.players[datos.game[i]]["roundPoints"] < 7.5 and datos.game[i] not in winner:
+                        print("esto es el jugador",datos.players[datos.game[i]])
+                        datos.players[datos.bank_player]["points"] -= datos.players[datos.bank_player]["bet"]
+                        datos.players[datos.game[i]]["points"] += datos.players[datos.bank_player]["bet"]
+            elif datos.players[winner]["roundPoints"] == 7.5:
+                print(datos.players[dni])
+                print("{} entrega {} puntos a {}".format(datos.players[dni]["name"],datos.players[dni]["bet"]*2,datos.players[winner]["name"]))
+                winner_points += datos.players[dni]["bet"]*2
+                datos.players[datos.bank_player]["priority"] = datos.players[winner]["priority"]
+                datos.players[datos.bank_player]["bank"] = False
+                datos.players[winner]["bank"] = True
+                datos.players[winner]["priority"] = len(datos.game)
+                datos.bank_player = winner
+                datos.players[dni]["points"] -= datos.players[dni]["bet"]*2
+            else:
+                winner_points += datos.players[dni]["bet"]
+                datos.players[dni]["points"] -= datos.players[dni]["bet"]
         if datos.players[dni]["points"] <= 0:
-            print("Este se tiene que ir a la mierda",datos.players[dni])
             datos.game.remove(dni)
-        if datos.players[winner]["roundPoints"] == 7.5:
-            datos.players[bank_player]["priority"] = datos.players[winner]["priority"]
-            datos.players[winner]["bank"] = True
-            datos.players[winner]["priority"] = len(datos.game)
-        datos.players[dni]["roundPoints"] = 0
+            print(center_string("{} is out of the game!".format(datos.players[dni]["name"])))
+        if len(datos.game) < datos.players[datos.bank_player]["priority"]:
+            for i in range(len(datos.game)):
+                if datos.players[datos.game[i]]["priority"] != 1:
+                    datos.players[datos.game[i]]["priority"] -= 1
     datos.players[winner]["points"] += winner_points
+    for dni in datos.game:
+        print(datos.players[dni])
+        datos.players[dni]["roundPoints"] = 0
+        datos.players[dni]["cards"] = []
     datos.ronda += 1
-    print(datos.players[winner])
     input(center_string("Enter to continue"))
 
 
