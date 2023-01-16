@@ -19,8 +19,11 @@ def playGame():
     for i in range(datos.maxRounds):
         for dni in datos.game:
             setBets()
-            print(center_string("Round {}".format(datos.ronda)))
-            standardRound(dni, datos.mazo)
+            if datos.players[dni]["human"]:
+                humanRound(dni,datos.mazo)
+            # print(center_string("Round {}".format(datos.ronda)))
+            else:
+                standardRound(dni, datos.mazo)
         distributionPointAndNewBankCandidates()
         orderAllPlayers()
         datos.maxRounds -= 1
@@ -158,8 +161,7 @@ def standardRound(id,mazo):
                             datos.players[dni]["roundPoints"] < 7.5) or (datos.players[dni]["roundPoints"] > 7.5):
                         higher_score += 1
                         half_players = len(datos.game)//2
-                        print("esto es half players",half_players)
-                        if higher_score >= half_players and plantarse < datos.players[id]["type"]:
+                        if higher_score >= half_players:
                             print("esto es higher score con plantarse",higher_score)
                             print(datos.players[id])
                             return
@@ -310,6 +312,52 @@ def distributionPointAndNewBankCandidates():
     datos.change = False
     datos.ronda += 1
     input(center_string("Enter to continue"))
+
+
+def humanRound(id,mazo):
+    textOps = (datos.space + "1)View Stats\n"+
+               datos.space + "2)View Game Stats\n"+
+               datos.space + "3)Set Bet\n"+
+               datos.space + "4)Order Card\n"+
+               datos.space + "5)Automatic Play\n"+
+               datos.space + "6)Stand\n")
+    inputOptText = datos.space + "Option: "
+    range_list = [1,2,3,4,5]
+    exception = [6]
+    option = getOpt(textOps,inputOptText,range_list,exception)
+    if option == 3:
+        if datos.players[id]["bank"]:
+            print(center_string("You're not allowed to set a bet if you're the bank"))
+        else:
+            while True:
+                try:
+                    datos.players[id]["bet"] = input("Set your bet: ")
+                    if not datos.players[id]["bet"].lstrip("-").isdigit():
+                        raise ValueError("Please, introduce only numbers")
+                    elif int(datos.players[id]["bet"]) <= 0:
+                        raise ValueError("Bet has to be a positive number and higher than 0")
+                    elif int(datos.players[id]["bet"]) > datos.players[id]["points"]:
+                        raise ValueError("Bet has to be a number between 1 and {}".format(datos.players[id]["points"]))
+                    else:
+                        datos.players[id]["bet"] = int(datos.players[id]["bet"])
+                        break
+                except ValueError as e:
+                    print(e)
+                    input(center_string("Enter to continue"))
+    elif option == 4:
+        datos.players[id]["cards"].append(mazo[0])
+        print("You draw the {} card".format(datos.cartas[mazo[0]]["literal"]))
+        datos.players[id]["roundPoints"] += datos.cartas[mazo[0]]["realValue"]
+        print("Now you have {} points".format(datos.players[id]["roundPoints"]))
+        datos.eliminadas.append(mazo[0])
+        mazo.remove(mazo[0])
+    elif option == 5:
+        standardRound(id,mazo)
+    elif option == 6:
+        return
+
+
+
 
 
 
