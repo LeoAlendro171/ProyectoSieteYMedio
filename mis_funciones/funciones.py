@@ -35,24 +35,24 @@ def setGamePriority(mazo):
     datos.eliminadas = []
     for dni in datos.game:
         datos.players[dni]["initialCard"] += mazo[0]
-        datos.players[dni]["roundPoints"] = datos.cartas[mazo[0]]["realValue"]
+        datos.players[dni]["roundPoints"] = datos.cartas[datos.context_game["mazo"]][mazo[0]]["realValue"]
         datos.eliminadas.append(mazo[0])
         mazo.remove(mazo[0])
-    for cards in datos.cartas:
+    for cards in datos.cartas[datos.context_game["mazo"]]:
         if cards not in mazo:
             mazo.append(cards)
     for i in range(len(datos.game)-1):
         for j in range(len(datos.game)-i-1):
             if datos.players[datos.game[j]]["roundPoints"] == datos.players[datos.game[j+1]]["roundPoints"]:
-                if datos.cartas[datos.players[datos.game[j]]["initialCard"]]["priority"] > \
-                        datos.cartas[datos.players[datos.game[j+1]]["initialCard"]]["priority"]\
-                        and datos.cartas[datos.players[datos.game[j]]["initialCard"]]["value"] > \
-                        datos.cartas[datos.players[datos.game[j+1]]["initialCard"]]["value"]:
+                if datos.cartas[datos.context_game["mazo"]][datos.players[datos.game[j]]["initialCard"]]["priority"] >\
+                   datos.cartas[datos.context_game["mazo"]][datos.players[datos.game[j+1]]["initialCard"]]["priority"]\
+                   and datos.cartas[datos.context_game["mazo"]][datos.players[datos.game[j]]["initialCard"]]["value"] >\
+                   datos.cartas[datos.context_game["mazo"]][datos.players[datos.game[j+1]]["initialCard"]]["value"]:
                     aux = datos.game[j]
                     datos.game[j] = datos.game[j+1]
                     datos.game[j+1] = aux
-                elif datos.cartas[datos.players[datos.game[j]]["initialCard"]]["priority"] > \
-                        datos.cartas[datos.players[datos.game[j+1]]["initialCard"]]["priority"]:
+                elif datos.cartas[datos.context_game["mazo"]][datos.players[datos.game[j]]["initialCard"]]["priority"]>\
+                     datos.cartas[datos.context_game["mazo"]][datos.players[datos.game[j+1]]["initialCard"]]["priority"]:
                     aux = datos.game[j]
                     datos.game[j] = datos.game[j+1]
                     datos.game[j+1] = aux
@@ -139,7 +139,7 @@ def standardRound(id,mazo):
         # print(center_string("Ronda {}".format(datos.ronda)))
         datos.players[id]["cards"].append(mazo[0])
         # print("Player {} draws {}!".format(datos.players[id]["name"],mazo[0]))
-        datos.players[id]["roundPoints"] += datos.cartas[mazo[0]]["realValue"]
+        datos.players[id]["roundPoints"] += datos.cartas[datos.context_game["mazo"]][mazo[0]]["realValue"]
         datos.eliminadas.append(mazo[0])
         mazo.remove(mazo[0])
         # print(datos.players[id])
@@ -151,7 +151,7 @@ def standardRound(id,mazo):
             bad_cards = 0
             plantarse = 0
             for cards in mazo:
-                if datos.players[id]["roundPoints"] + datos.cartas[cards]["realValue"] > 7.5:
+                if datos.players[id]["roundPoints"] + datos.cartas[datos.context_game["mazo"]][cards]["realValue"] > 7.5:
                     bad_cards += 1
             if bad_cards > 0:
                 plantarse = (bad_cards / len(mazo)) * 100
@@ -361,7 +361,8 @@ def humanRound(id,mazo):
                 bad_cards = 0
                 plantarse = 0
                 for cards in mazo:
-                    if datos.players[id]["roundPoints"] + datos.cartas[cards]["realValue"] > 7.5:
+                    if datos.players[id]["roundPoints"] + \
+                            datos.cartas[datos.context_game["mazo"]][cards]["realValue"] > 7.5:
                         bad_cards += 1
                 if bad_cards > 0:
                     plantarse = (bad_cards / len(mazo)) * 100
@@ -372,8 +373,9 @@ def humanRound(id,mazo):
                     continue
             if datos.players[id]["roundPoints"] < 7.5:
                 datos.players[id]["cards"].append(mazo[0])
-                print(center_string("You draw the {} card".format(datos.cartas[mazo[0]]["literal"])))
-                datos.players[id]["roundPoints"] += datos.cartas[mazo[0]]["realValue"]
+                print(center_string("You draw the "
+                                    "{} card".format(datos.cartas[datos.context_game["mazo"]][mazo[0]]["literal"])))
+                datos.players[id]["roundPoints"] += datos.cartas[datos.context_game["mazo"]][mazo[0]]["realValue"]
                 print(center_string("Now you have {} points".format(datos.players[id]["roundPoints"])))
                 datos.eliminadas.append(mazo[0])
                 mazo.remove(mazo[0])
@@ -408,16 +410,16 @@ def printStats(idPlayer="",titulo=""):
 
 
 def printPlayerStats(id):
-    info = datos.space+"Name".ljust(20)+datos.players[id].get("name") + "\n"*2 + \
-           datos.space+"Human".ljust(20)+ str(datos.players[id].get("human")) + "\n"*2+\
-           datos.space+"Type".ljust(20)+ str(datos.players[id].get("type")) + "\n"*2 + \
-           datos.space+"Bank".ljust(20)+ str(datos.players[id].get("bank")) + "\n"*2+ \
-           datos.space+"Bet".ljust(20)+ str(datos.players[id].get("bet")) + "\n"*2 + \
-           datos.space+"Points".ljust(20)+ str(datos.players[id].get("points")) + "\n"*2+ \
+    info = datos.space+"Name".ljust(20)+datos.players[id].get("name") + "\n" + \
+           datos.space+"Human".ljust(20)+ str(datos.players[id].get("human")) + "\n"+\
+           datos.space+"Type".ljust(20)+ str(datos.players[id].get("type")) + "\n" + \
+           datos.space+"Bank".ljust(20)+ str(datos.players[id].get("bank")) + "\n"+ \
+           datos.space+"Bet".ljust(20)+ str(datos.players[id].get("bet")) + "\n" + \
+           datos.space+"Points".ljust(20)+ str(datos.players[id].get("points")) + "\n"+ \
            datos.space+"Cards".ljust(20)
     for cards in datos.players[id]["cards"]:
         info += str(cards)+";"
-    info += "\n"*2+datos.space+"RoundPoints".ljust(20)+str(datos.players[id].get("roundPoints")) + "\n"
+    info += "\n"+datos.space+"RoundPoints".ljust(20)+str(datos.players[id].get("roundPoints")) + "\n"
     print(info)
 
 
@@ -578,13 +580,16 @@ def showPlayersGame():
         input(center_string("Enter to continue"))
 
 def setMaxRounds():
+    print(datos.titulo_023)
     while True:
         try:
-            datos.maxRounds = input(center_string("Max Rounds: "))
+            datos.maxRounds = input(datos.space+"Max Rounds: ")
             if not datos.maxRounds.lstrip("-").isdigit():
                 raise ValueError(center_string("Please, enter a number"))
             elif int(datos.maxRounds) < 1:
                 raise ValueError(center_string("Please, enter a valid number of rounds"))
+            elif int(datos.maxRounds) >= 30:
+                raise ValueError(center_string("Maximum number of rounds exceeded"))
             else:
                 datos.maxRounds = int(datos.maxRounds)
                 print(center_string("Rounds set to {}".format(datos.maxRounds)))
@@ -594,8 +599,28 @@ def setMaxRounds():
             input(center_string("Enter to continue"))
 
 def setCardsDeck():
-    for ids in datos.cartas:
-        datos.mazo += [ids]
+    print(datos.titulo_022)
+    textOps = datos.space+"1) ESP - ESP \n"+\
+              datos.space+"2) POK - POK \n"+\
+              datos.space+"0) Go Back\n"
+    inputOptText = datos.space + "Option: "
+    range_list = [1,2]
+    exception = [0]
+    option = getOpt(textOps,inputOptText,range_list,exception)
+    if option == 1:
+        datos.context_game["mazo"] = "spanish"
+        for ids in datos.cartas["spanish"]:
+            datos.mazo += [ids]
+        print(datos.space+"Deck set to Spanish deck")
+        input(datos.space+"Enter to continue")
+    elif option == 2:
+        datos.context_game["mazo"] = "poker"
+        for ids in datos.cartas["poker"]:
+            datos.mazo += [ids]
+        print(datos.space+"Deck set to Poker deck")
+        input(datos.space+"Enter to continue")
+    elif option == 0:
+        return
     return datos.mazo
 
 
