@@ -320,6 +320,8 @@ def distributionPointAndNewBankCandidates():
 
 
 def humanRound(id,mazo):
+    clear()
+    print(datos.titulo_03)
     if datos.players[id]["bank"]:
         datos.bank_player = id
     textOps = (datos.space + "1)View Stats\n"+
@@ -335,6 +337,12 @@ def humanRound(id,mazo):
         option = getOpt(textOps, inputOptText, range_list, exception)
         if option == 1:
             printPlayerStats(id)
+            clear()
+            print(datos.titulo_03)
+        elif option == 2:
+            clear()
+            print(datos.titulo_03)
+            printStats()
         elif option == 3:
             if datos.players[id]["bank"]:
                 print(center_string("You're not allowed to set a bet if you're the bank"))
@@ -388,28 +396,43 @@ def humanRound(id,mazo):
             return
         elif option == 6:
             return
+        clear()
+        print(datos.titulo_03)
 
-
-def printStats(idPlayer="",titulo=""):
-    titulo = "Name".ljust(20)+\
-             "Human".ljust(20)+\
-             "Priority".ljust(20)+\
-             "Type".ljust(20)+\
-             "Bank".ljust(20)+\
-             "Bet".ljust(20)+\
-             "Points".ljust(20)+\
-             "Cards".ljust(20)+\
-             "Roundpoints".ljust(20)
-    info = ""
-    for dni in datos.game[::-1]:
-        info += datos.players[dni].get("name") + "\n" + datos.players[dni].get("human") + \
-                datos.players[dni].get("type") + "\n" + datos.players[dni].get("bank") + \
-                datos.players[dni].get("bet") + "\n" + datos.players[dni].get("points")
-        for cards in datos.players[dni]["cards"]:
-            info += cards + ";"
-
+def printStats():
+    titulo = " "*25+"="*100+"\n"+\
+             " "*25+"|"+"Name".center(10)+\
+                  "|"+"Human".center(10)+\
+                  "|"+"Priority".center(10)+\
+                  "|"+"Type".center(10)+\
+                  "|"+"Bank".center(10)+\
+                  "|"+"Bet".center(10)+\
+                  "|"+"Points".center(10)+\
+                  "|"+"Cards".center(10)+\
+                  "|"+"Roundpoints".center(10)+"\n"+" "*25+"="*100
+    playerId = ""
+    for i in range(len(datos.game)):
+        playerId += " "*25+"|"+str(datos.players[datos.game[i]]["name"]).center(10) +"|"+\
+                    str(datos.players[datos.game[i]]["human"]).center(10) +"|"+ \
+                    str(datos.players[datos.game[i]]["priority"]).center(10) + "|"+\
+                    str(datos.players[datos.game[i]]["type"]).center(10) +"|"+ \
+                    str(datos.players[datos.game[i]]["bank"]).center(10) +"|"+ \
+                    str(datos.players[datos.game[i]]["bet"]).center(10) +"|"+ \
+                    str(datos.players[datos.game[i]]["points"]).center(10)
+        if len(datos.players[datos.game[i]]["cards"]) == 0:
+            playerId += "|"+ " ".ljust(10)
+            playerId += "|" + str(datos.players[datos.game[i]]["roundPoints"]).center(10) + "|" + "\n" + " "*25+"-" * 100 + "\n"
+        else:
+            for cards in datos.players[datos.game[i]]["cards"]:
+                playerId += "|" + cards
+            playerId += "|"+str(datos.players[datos.game[i]]["roundPoints"]).center(10)+ "|"+ "\n" + " "*25+"-"*100 + "\n"
+    print(titulo)
+    print(playerId)
+    input(center_string("Enter to Continue"))
 
 def printPlayerStats(id):
+    clear()
+    print(datos.titulo_03)
     info = datos.space+"Name".ljust(20)+datos.players[id].get("name") + "\n" + \
            datos.space+"Human".ljust(20)+ str(datos.players[id].get("human")) + "\n"+\
            datos.space+"Type".ljust(20)+ str(datos.players[id].get("type")) + "\n" + \
@@ -421,6 +444,7 @@ def printPlayerStats(id):
         info += str(cards)+";"
     info += "\n"+datos.space+"RoundPoints".ljust(20)+str(datos.players[id].get("roundPoints")) + "\n"
     print(info)
+    input(center_string("Enter to continue"))
 
 
 
@@ -473,10 +497,25 @@ def settings():
     textOpts = datos.space + "1)Set Game Players" + "\n" + datos.space + "2)Set Card's Deck" + \
                "\n" + datos.space + "3)Set Max Rounds (Default 5 Rounds)" + "\n" + datos.space + "4)Go Back"
     inputOptText = datos.space + "Option: "
-    option_range = [1, 2, 3, 4]
-    exception = []
+    option_range = [1, 2, 3]
+    exception = [4]
     option = getOpt(textOpts, inputOptText, option_range, exception)
-    return option
+    if option == 1:
+        clear()
+        print(datos.titulo_021)
+        showPlayersGame()
+        datos.flg_02 = False
+        datos.flg_021 = True
+    elif option == 2:
+        clear()
+        setCardsDeck()
+    elif option == 3:
+        clear()
+        setMaxRounds()
+    elif option == 4:
+        clear()
+        datos.flg_02 = False
+        datos.flg_00 = True
 
 
 def setPlayersGame():

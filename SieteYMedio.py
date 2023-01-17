@@ -26,8 +26,10 @@ while not datos.Salir:
             elif len(datos.mazo) == 0:
                 print(datos.space + "Set the deck first")
                 input(datos.space + "Enter to continue")
+                funciones.clear()
             elif datos.maxRounds == 0:
                 print(funciones.center_string("Please, set the number of rounds first"))
+                funciones.clear()
             else:
                 funciones.playGame()
                 datos.flg_00 = False
@@ -55,23 +57,7 @@ while not datos.Salir:
     while datos.flg_02:
         funciones.clear()
         print(datos.titulo_02)
-        option = funciones.settings()
-        if option == 1:
-            funciones.clear()
-            print(datos.titulo_021)
-            funciones.showPlayersGame()
-            datos.flg_02 = False
-            datos.flg_021 = True
-        elif option == 2:
-            funciones.clear()
-            funciones.setCardsDeck()
-        elif option == 3:
-            funciones.clear()
-            funciones.setMaxRounds()
-        elif option == 4:
-            funciones.clear()
-            datos.flg_02 = False
-            datos.flg_00 = True
+        funciones.settings()
     while datos.flg_021:
         print(datos.titulo_021)
         option = funciones.setPlayersGame()
