@@ -269,6 +269,7 @@ maxRounds = 5
 game_round = 0
 ronda = 0
 eliminadas = []
+losers = []
 change = False
 bank_player = ""
 
