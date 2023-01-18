@@ -32,8 +32,6 @@ while not datos.Salir:
                 funciones.clear()
             else:
                 funciones.playGame()
-                datos.flg_00 = False
-                datos.flg_03 = True
         elif option == 4:
             datos.flg_00 = False
             datos.flg_04 = True
