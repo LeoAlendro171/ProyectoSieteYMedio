@@ -266,9 +266,10 @@ def distributionPointAndNewBankCandidates():
                             datos.players[winner]["points"] += datos.players[datos.bank_player]["points"]
                             datos.players[datos.bank_player]["points"] -= datos.players[datos.bank_player]["points"]
                         else:
-                            results += datos.space+"{} pays {} points to {}\n".format(datos.players[datos.bank_player]["name"],
-                                                                        datos.players[winner]["bet"] * 2,
-                                                                        datos.players[winner]["name"])
+                            results += datos.space+"{} pays {} " \
+                                                   "points to {}\n".format(datos.players[datos.bank_player]["name"],
+                                                                           datos.players[winner]["bet"] * 2,
+                                                                           datos.players[winner]["name"])
                             datos.players[winner]["points"] += datos.players[winner]["bet"] * 2
                             datos.players[datos.bank_player]["points"] -= datos.players[winner]["bet"] * 2
                         datos.change = True
@@ -367,7 +368,8 @@ def humanRound(id,mazo):
                         elif int(datos.players[id]["bet"]) <= 0:
                             raise ValueError("\nBet has to be a positive number and higher than 0")
                         elif int(datos.players[id]["bet"]) > datos.players[id]["points"]:
-                            raise ValueError("\nBet has to be a number between 1 and {}".format(datos.players[id]["points"]))
+                            raise ValueError("\nBet has to be a "
+                                             "number between 1 and {}".format(datos.players[id]["points"]))
                         else:
                             datos.players[id]["bet"] = int(datos.players[id]["bet"])
                             print(datos.space+"Bet set to {}".format(datos.players[id]["bet"]))
