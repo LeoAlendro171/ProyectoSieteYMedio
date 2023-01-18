@@ -27,7 +27,7 @@ while not datos.Salir:
                 print(datos.space + "Set the deck first")
                 input(datos.space + "Enter to continue")
                 funciones.clear()
-            elif datos.maxRounds == 0:
+            elif datos.maxRounds <= 0:
                 print(funciones.center_string("Please, set the number of rounds first"))
                 funciones.clear()
             else:

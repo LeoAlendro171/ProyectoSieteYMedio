@@ -101,6 +101,7 @@ def checkMinimum2PlayersWithPoints():
             two_players -= 1
     if two_players < 2:
         print("Not enough players with points")
+        datos.maxRounds = 0
 
 
 def orderAllPlayers(order="asc"):
@@ -132,11 +133,7 @@ def setBets():
             datos.players[dni]["bet"] = 1
         if datos.bank_player != "":
             if datos.players[dni]["bet"] > datos.players[datos.bank_player]["points"]:
-                print(datos.bank_player)
-                print("se activa condicion apuestas",datos.players[dni]["bet"],datos.players[datos.bank_player]["points"])
                 datos.players[dni]["bet"] = datos.players[datos.bank_player]["points"]
-                print("despues de igualar puntos", datos.players[dni]["bet"],
-                      datos.players[datos.bank_player]["points"])
 
 
 def getOpt(textOpts="", inputOptText="", rangeList=[], exceptions=[]):
@@ -177,7 +174,8 @@ def standardRound(id,mazo):
             bad_cards = 0
             plantarse = 0
             for cards in mazo:
-                if datos.players[id]["roundPoints"] + datos.cartas[datos.context_game["mazo"]][cards]["realValue"] > 7.5:
+                if datos.players[id]["roundPoints"] + \
+                        datos.cartas[datos.context_game["mazo"]][cards]["realValue"] > 7.5:
                     bad_cards += 1
             if bad_cards > 0:
                 plantarse = (bad_cards / len(mazo)) * 100
@@ -436,7 +434,7 @@ def humanRound(id,mazo):
 
 def printStats():
     titulo = "="*140+"\n"+\
-             "|"+"Name".center(10)+\
+                  "|"+"Name".center(10)+\
                   "|"+"Human".center(10)+\
                   "|"+"Priority".center(10)+\
                   "|"+"Type".center(10)+\
