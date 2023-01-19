@@ -40,9 +40,6 @@ def playGame():
     printWinner()
     datos.maxRounds = 5
     datos.ronda = 0
-    if len(datos.losers) > 0:
-        for dni in datos.losers:
-            datos.game.append(dni)
     datos.flg_03 = False
     datos.flg_00 = True
     return
@@ -197,6 +194,8 @@ def standardRound(id,mazo):
 
 
 def printWinner():
+    clear()
+    print(datos.titulo_winner)
     winner = ""
     if len(datos.game) == 1:
         winner = datos.game[0]
@@ -204,16 +203,22 @@ def printWinner():
         for i in range(len(datos.game)-1):
             for j in range(len(datos.game)-i-1):
                 if datos.players[datos.game[j]]["points"] < datos.players[datos.game[j+1]]["points"]:
+                    print(datos.game[j],datos.players[datos.game[j]]["points"],
+                          datos.game[j+1],datos.players[datos.game[j+1]]["points"])
                     aux = datos.game[j]
                     datos.game[j] = datos.game[j+1]
                     datos.game[j+1] = aux
-                    winner = datos.game[j]
+                elif datos.players[datos.game[j]]["points"] == datos.players[datos.game[j+1]]["points"]:
+                    if datos.players[datos.game[j]]["priority"] > datos.players[datos.game[j+1]]["priority"]:
+                        print("hola?")
+                winner = datos.game[j]
     print(center_string("The winner is {} - {}, "
                         "in {} rounds, with {} points").format(winner,
                                                                datos.players[winner]["name"],
                                                                datos.ronda,
                                                                datos.players[winner]["points"]))
     input(center_string("Enter to Continue"))
+    clear()
 
 
 def distributionPointAndNewBankCandidates():
@@ -423,7 +428,7 @@ def humanRound(id,mazo):
                 input(center_string("Enter to continue"))
             else:
                 print(datos.space+"You have {} points, "
-                                    "you can't draw more cards".format(datos.players[id]["roundPoints"]))
+                                  "you can't draw more cards".format(datos.players[id]["roundPoints"]))
         elif option == 5:
             standardRound(id,mazo)
             return
@@ -665,6 +670,7 @@ def setMaxRounds():
             else:
                 datos.maxRounds = int(datos.maxRounds)
                 print(center_string("Rounds set to {}".format(datos.maxRounds)))
+                input(center_string("Enter to continue"))
                 return datos.maxRounds
         except ValueError as e:
             print(e)
@@ -695,6 +701,18 @@ def setCardsDeck():
     elif option == 0:
         return
     return datos.mazo
+
+
+def fill_player_game(player_game,gameID,*fields):
+    print("hola")
+
+
+
+def fill_player_game_round(player_game_round,round,*fields):
+    print("hola")
+
+
+
 
 
 
