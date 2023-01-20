@@ -21,18 +21,19 @@ def getPlayers():
     cursor = cnx.cursor()
     cursor.execute("SELECT * from player")
     for table_name in cursor:
-        if table_name[3] == 0:
-            elupdate = {table_name[0]:{"name": table_name[1],"human": False,
-                                       "bank": False, "initialCard": "", "priority": 0,
-                                       "type": table_name[2],"bet": 0,"points": 0,
-                                       "cards": [],"roundPoints": 0}}
-            datos.players.update(elupdate)
-        elif table_name[3] == 1:
-            elupdate = {table_name[0]:{"name": table_name[1],"human": True,
-                                       "bank": False, "initialCard": "", "priority": 0,
-                                       "type": table_name[2],"bet": 0,"points": 0,
-                                       "cards": [],"roundPoints": 0}}
-            datos.players.update(elupdate)
+        if table_name[0] not in datos.players:
+            if table_name[3] == 0:
+                elupdate = {table_name[0]:{"name": table_name[1],"human": False,
+                                           "bank": False, "initialCard": "", "priority": 0,
+                                           "type": table_name[2],"bet": 0,"points": 0,
+                                           "cards": [],"roundPoints": 0}}
+                datos.players.update(elupdate)
+            elif table_name[3] == 1:
+                elupdate = {table_name[0]:{"name": table_name[1],"human": True,
+                                           "bank": False, "initialCard": "", "priority": 0,
+                                           "type": table_name[2],"bet": 0,"points": 0,
+                                           "cards": [],"roundPoints": 0}}
+                datos.players.update(elupdate)
 
 def clear():
     print("\033[H\033[J", end="")
@@ -525,30 +526,68 @@ def newPlayer(dni, name, profile, human):
     return player_data
 
 
+def randomNIF():
+    nif = ""
+    for i in range(7):
+        nif += str(random.randint(1,9))
+
+
 def setNewPlayer(human = True):
     while True:
         try:
+            notbot = 0
             name = input(datos.space+"Name: ")
             if not name.isalpha():
                 raise ValueError(datos.space + "Incorrect name, enter a name that is not empty with only letters")
-            dni = input(datos.space+"NIF: ")
-            if not len(dni) == 9 or not dni[:8].isdigit() or not dni[8].isalpha() \
-               or not datos.letrasDni[int(dni[:8])%23] == dni[8].upper():
-                raise ValueError(datos.space + "Wrong NIF")
+            if human:
+                notbot = 1
+                dni = input(datos.space+"NIF: ")
+                if not len(dni) == 9 or not dni[:8].isdigit() or not dni[8].isalpha() \
+                   or not datos.letrasDni[int(dni[:8])%23] == dni[8].upper():
+                    raise ValueError(datos.space + "Wrong NIF")
+                elif dni in datos.players:
+                    raise ValueError(datos.space + "NIF {} already exists".format(dni))
+            elif not human:
+                print("hola")
             textOps = datos.space+"Select your Profile:\n"+\
-                                        datos.space+"1)Cautious\n"+\
-                                        datos.space+"2)Moderated\n"+\
-                                        datos.space+"3)Bold\n"
+                      datos.space+"1)Cautious\n"+\
+                      datos.space+"2)Moderated\n"+\
+                      datos.space+"3)Bold\n"
             inputOptText = datos.space+"Option: "
             option_range = [1,2,3]
             exception = []
             option = getOpt(textOps,inputOptText,option_range,exception)
+            profile = 0
             if option == 1:
                 profile = 30
             elif option == 2:
                 profile = 40
             elif option == 3:
                 profile = 50
+            info = datos.space+"Name:".ljust(10) + name +"\n"+\
+                   datos.space+"DNI:".ljust(10) + dni +"\n"
+            if profile == 30:
+                info += datos.space+"Profile:".ljust(10) + "Cautious"+"\n"
+            elif profile == 40:
+                info += datos.space+"Profile:".ljust(10) + "Moderated"+"\n"
+            elif profile == 50:
+                info += datos.space+"Profile:".ljust(10) + "Bold"+"\n"
+            print(info)
+            confirmation = input(datos.space+"Is it okay? (Y/y = yes, any other key = no): ")
+            if not confirmation.lower() == "y":
+                return
+            else:
+                cnx = mysql.connector.connect(user="root", password="1234",
+                                              host="127.0.0.1",
+                                              database="seven_half")
+                cursor = cnx.cursor()
+                cursor.execute("INSERT INTO player (player_id, player_name, player_risk,human) "
+                               "VALUES ('{}','{}',{},{})".format(dni,name,profile,notbot))
+                cnx.commit()
+                getPlayers()
+                return
+
+
         except ValueError as e:
             print(e)
             input(datos.space+"Enter to continue")
@@ -705,16 +744,22 @@ def removeBBDDPlayer():
         try:
             option = input(datos.space+"Option (-id to remove player, -1 to exit): ")
             if option == "-1":
-                break
+                return
+            elif option[0] != "-":
+                raise ValueError(datos.space+"Invalid Option")
             elif option.lstrip("-") not in datos.players:
-                raise ValueError("Invalid Option")
+                raise ValueError(datos.space+"Invalid Option")
             else:
                 cnx = mysql.connector.connect(user="root", password="1234",
                                               host="127.0.0.1",
                                               database="seven_half")
                 cursor = cnx.cursor()
-                cursor.execute("DELETE from player WHERE player_id = '{}'".format(option))
-
+                cursor.execute("DELETE from player WHERE player_id = '{}'".format(option.lstrip("-")))
+                cnx.commit()
+                datos.players.pop(option.lstrip("-"))
+                getPlayers()
+                clear()
+                removeBBDDPlayer()
         except ValueError as e:
             print(e)
 
