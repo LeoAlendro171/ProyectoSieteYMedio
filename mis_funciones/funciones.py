@@ -1,12 +1,38 @@
+import mysql.connector
+
 from . import datos
 import random
+import _mysql_connector
 
-
+def prueba():
+    cnx = mysql.connector.connect(user = "root", password = "1234",
+                                host = "127.0.0.1",
+                                database = "seven_half")
 def center_string(string, width=140):
     spaces = (width - len(string)) // 2
     centered_string = " " * spaces + string + " " * spaces
     return centered_string
 
+
+def getPlayers():
+    cnx = mysql.connector.connect(user = "root", password = "1234",
+                                  host = "127.0.0.1",
+                                  database = "seven_half")
+    cursor = cnx.cursor()
+    cursor.execute("SELECT * from player")
+    for table_name in cursor:
+        if table_name[3] == 0:
+            elupdate = {table_name[0]:{"name": table_name[1],"human": False,
+                                       "bank": False, "initialCard": "", "priority": 0,
+                                       "type": table_name[2],"bet": 0,"points": 0,
+                                       "cards": [],"roundPoints": 0}}
+            datos.players.update(elupdate)
+        elif table_name[3] == 1:
+            elupdate = {table_name[0]:{"name": table_name[1],"human": True,
+                                       "bank": False, "initialCard": "", "priority": 0,
+                                       "type": table_name[2],"bet": 0,"points": 0,
+                                       "cards": [],"roundPoints": 0}}
+            datos.players.update(elupdate)
 
 def clear():
     print("\033[H\033[J", end="")
@@ -631,6 +657,68 @@ def setPlayersGame():
         print("Invalid option".center(140,"*"))
         input(center_string("Enter to continue"))
 
+def removeBBDDPlayer():
+    print(datos.titulo_021)
+    print("Select players".center(140, "*"))
+    print("Bot Players".center(70)+"Human Players".center(70)+"\n"+"-"*140)
+    players_data = ""
+    bot_players = []
+    human_players = []
+    header = ("ID".ljust(20) + "Name".ljust(20) + "Type".ljust(20)).ljust(64) + "|".ljust(4)+\
+             ("ID".ljust(20) + "Name".ljust(20) + "Type".ljust(20) + "\n" + "*" * 140).ljust(70)
+    print(header)
+    for dni in datos.players:
+        player = datos.players[dni]
+        if player["human"]:
+            human_players.append({"dni": dni, "name": player["name"], "type": player["type"]})
+        else:
+            bot_players.append({"dni": dni, "name": player["name"], "type": player["type"]})
+    if len(human_players) > len(bot_players):
+        max_list = human_players
+    else:
+        max_list = bot_players
+    for i in range(len(max_list)):
+        if i < len(bot_players):
+            players_data += bot_players[i]["dni"].ljust(20) + bot_players[i]['name'].ljust(20)
+            if bot_players[i]["type"] == 30:
+                players_data += "Cautious".ljust(20)
+            elif bot_players[i]["type"] == 40:
+                players_data += "Moderated".ljust(20)
+            elif bot_players[i]["type"] == 50:
+                players_data += "Bold".ljust(20)
+        else:
+            players_data += "".ljust(20) + "".ljust(20) + "".ljust(20)
+        players_data += "\t|\t"
+        if i < len(human_players):
+            players_data += human_players[i]["dni"].ljust(20) + human_players[i]['name'].ljust(20)
+            if human_players[i]["type"] == 30:
+                players_data += "Cautious".ljust(20)
+            elif human_players[i]["type"] == 40:
+                players_data += "Moderated".ljust(20)
+            elif human_players[i]["type"] == 50:
+                players_data += "Bold".ljust(20)
+            else:
+                players_data += "".ljust(20) + "".ljust(20) + "".ljust(20)
+        players_data += "\n"
+    print(players_data)
+    while True:
+        try:
+            option = input(datos.space+"Option (-id to remove player, -1 to exit): ")
+            if option == "-1":
+                break
+            elif option.lstrip("-") not in datos.players:
+                raise ValueError("Invalid Option")
+            else:
+                cnx = mysql.connector.connect(user="root", password="1234",
+                                              host="127.0.0.1",
+                                              database="seven_half")
+                cursor = cnx.cursor()
+                cursor.execute("DELETE from player WHERE player_id = '{}'".format(option))
+
+        except ValueError as e:
+            print(e)
+
+
 
 def showPlayersGame():
     player_data = ""
@@ -687,7 +775,7 @@ def setCardsDeck():
     exception = [0]
     option = getOpt(textOps,inputOptText,range_list,exception)
     if option == 1:
-        datos.context_game["mazo"] = "spanish"
+        datos.context_game["mazo"] = "ESP"
         for ids in datos.cartas["spanish"]:
             datos.mazo += [ids]
         print(datos.space+"Deck set to Spanish deck")
@@ -712,6 +800,33 @@ def fill_player_game_round(player_game_round,round,*fields):
     print("hola")
 
 
+def getBBDDRanking():
+    #Función que crea la vista player_earnings, y retorna un diccionario con los datos de ésta,
+    #  player_id | earnings | games_played | minutes_played
+    dict_datos = {}
+    cnx = mysql.connector.connect(user="root", password="1234",
+                                  host="127.0.0.1",
+                                  database="seven_half")
+    query = "drop view if exists player_earnings"
+    cursor = cnx.cursor()
+    cursor.execute(query)
+    cnx.commit()
+    query = "create view player_earnings as select pg.player_id AS player_id, " \
+            "sum((pg.ending_points - pg.starting_points)) AS earnings, count(pg.cardgame_id) AS games_played, " \
+            "sum(timestampdiff(SECOND,c.start_hour,c.end_hour)) / 60 AS minutes_played from player_game pg " \
+            "join cardgame c on pg.cardgame_id = c.cardgame_id group by pg.player_id"
+    cursor = cnx.cursor()
+    cursor.execute(query)
+    cnx.commit()
+    query = "SELECT * FROM player_earnings"
+    cursor.execute(query)
+    info = cursor.fetchall()
+    for player in info:
+        dict_datos[player[0]]={}
+        dict_datos[player[0]]["earnings"] = int(player[1])
+        dict_datos[player[0]]["games_played"] = int(player[2])
+        dict_datos[player[0]]["minutes_played"] = float(player[3])
+    return dict_datos
 
 
 

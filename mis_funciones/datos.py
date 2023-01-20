@@ -113,44 +113,17 @@ cartas = {"spanish":{
 # Prioridad Poker - Españolas//Diamantes = oros, corazones = copas, picas = espadas, tréboles = bastos
 
 # Diccionario de jugadores
-players = {"11115555A":
-{"name": "Mario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 0, "points": 0
-    ,"cards": [], "roundPoints": 0},
-"22225555A":
-{"name": "Pedro", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 0, "points": 0
-    ,"cards": [], "roundPoints": 0},
-"99999999A":
-{"name": "Alex", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 30, "bet": 0, "points": 0
- , "cards": [], "roundPoints": 0},
-"88888888X":
-{"name": "Pepe", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
- "cards": [], "roundPoints": 0},
-"77777777N":
-{"name": "Dario", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
- "cards": [], "roundPoints": 0},
-"10101010F":
-{"name": "Julia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
- "cards": [], "roundPoints": 0},
-"11111111E":
-{"name": "Silvia", "human": False, "bank": False, "initialCard": "", "priority": 0, "type": 40, "bet": 0, "points": 0,
- "cards": [], "roundPoints": 0},
-"22222222D":
-{"name": "Carlos", "human": True, "bank": False, "initialCard": "", "priority": 0, "type": 50, "bet": 0, "points": 0,
- "cards": [], "roundPoints": 0}
-}
+players = {}
 
 # Provisional///
 # Lista <game> donde irán los NIF de todos los jugadores que participan en la partida en cada momento
-game = ["99999999A",
-        "88888888X",
-        "22222222D",
-        "11111111E"]
+game = []
 
 # Lista <mazo> donde irán todos los IDs de las cartas que componen el mazo en cada momento
 mazo = []
 
 # Diccionario donde tendremos una serie de variables de contexto a las que podremos acceder desde cualquier sitio
-context_game = {"game_players": game, "mazo": ""}
+context_game = {"players": players, "game": game, "mazo": ""}
 
 # Diccionarios para las tablas de BBDD que hay que actualizar durante el juego
 cardgame = {"cardgame_id": 0, "players": 0, "start_hour": "hora inicio partida(datetime)", "rounds": 0,

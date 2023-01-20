@@ -3,6 +3,7 @@ from mis_funciones import datos
 
 
 while not datos.Salir:
+    funciones.getPlayers()
     while datos.flg_00:
         print(datos.titulo_00)
         textOpts = datos.space + "1)Add/Remove/Show Players" + "\n" + datos.space + "2)Settings" + \
@@ -48,6 +49,9 @@ while not datos.Salir:
         if option == 1:
             funciones.clear()
             funciones.setNewPlayer()
+        elif option == 3:
+            funciones.clear()
+            funciones.removeBBDDPlayer()
         elif option == 4:
             funciones.clear()
             datos.flg_01 = False
