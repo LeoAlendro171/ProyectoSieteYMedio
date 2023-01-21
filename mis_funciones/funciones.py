@@ -50,7 +50,6 @@ def playGame():
     datos.cardgame["cardgame_id"] = game_id
     datos.cardgame["players"] = len(datos.game)
     datos.cardgame["start_hour"] = time.strftime("%Y-%m-%d %H:%M:%S")
-    print(datos.cardgame)
     setGamePriority(datos.mazo)
     fill_player_game(datos.player_game,game_id,"starting_points")
     orderAllPlayers()
@@ -65,8 +64,14 @@ def playGame():
                 standardRound(dni, datos.mazo)
                 roundHeader(dni)
                 printStats()
+            fill_player_game_round(datos.player_game_round,game_id,datos.ronda,"starting_round_points")
         clear()
         distributionPointAndNewBankCandidates()
+        fill_player_game_round(datos.player_game_round, game_id, datos.ronda, "ending_round_points")
+        for dni in datos.game:
+            datos.players[dni]["roundPoints"] = 0
+            datos.players[dni]["cards"] = []
+        datos.ronda += 1
         checkMinimum2PlayersWithPoints()
         orderAllPlayers()
         datos.maxRounds -= 1
@@ -77,6 +82,8 @@ def playGame():
     datos.cardgame["end_hour"] = time.strftime("%Y-%m-%d %H:%M:%S")
     fill_player_game(datos.player_game, game_id, "ending_points")
     insertBBDDCardgame(datos.cardgame)
+    insertBBDD_player_game(datos.player_game, game_id)
+    insertBBDD_player_game_round(datos.player_game_round,game_id)
     datos.maxRounds = 5
     datos.ronda = 0
     datos.flg_03 = False
@@ -396,11 +403,7 @@ def distributionPointAndNewBankCandidates():
     print("Round is over, these are the results".center(140, "*"))
     print(results)
     printStats()
-    for dni in datos.game:
-        datos.players[dni]["roundPoints"] = 0
-        datos.players[dni]["cards"] = []
     datos.change = False
-    datos.ronda += 1
 
 
 def humanRound(id,mazo):
@@ -865,31 +868,79 @@ def setCardsDeck():
 
 def fill_player_game(player_game,gameID,fields):
     player_game[gameID] = {}
-    for i in range(len(datos.game)):
-        player_game[gameID] = {datos.game[i]: {}}
+    if player_game[gameID] == {}:
+        for i in range(len(datos.game)):
+            player_dict = {datos.game[i]: {"initial_card_id": datos.players[datos.game[i]]["initialCard"],
+                                            "initial_card_deck_id": "",
+                                            "starting_points": 20, "ending_points": 0}}
+            player_game[gameID].update(player_dict)
+    for dni in player_game[gameID]:
         if datos.context_game["mazo"] == "spanish":
-            player_game[gameID][datos.game[i]] = {"initial_card_id": "",
-                                                  "initial_card_deck_id": "ESP",
-                                                  "starting_points": 20, "ending_points": 0}
+            player_game[gameID][dni] = {"initial_card_id": datos.players[dni]["initialCard"],
+                                        "initial_card_deck_id": "ESP",
+                                        "starting_points": 20, "ending_points": 0}
         elif datos.context_game["mazo"] == "poker":
-            player_game[gameID][datos.game[i]] = {"initial_card_id": "",
-                                                  "initial_card_deck_id": "POK",
-                                                  "starting_points": 20, "ending_points": 0}
-        player_game[gameID][datos.game[i]]["initial_card_id"] = datos.players[datos.game[i]]["initialCard"]
-        player_game[gameID][datos.game[i]][fields] = datos.players[datos.game[i]]["points"]
+            player_game[gameID][dni] = {"initial_card_id": datos.players[dni]["initialCard"],
+                                        "initial_card_deck_id": "POK",
+                                        "starting_points": 20, "ending_points": 0}
+        player_game[gameID][dni][fields] = datos.players[dni]["points"]
 
 
 def insertBBDD_player_game(player_game,cardgame_id):
-    for dni in datos.game:
-        print("hola")
+    cnx = mysql.connector.connect(user = "root", password = "1234",
+                                  host = "127.0.0.1",
+                                  database = "seven_half")
+    cursor = cnx.cursor()
+    for dni in player_game[cardgame_id]:
+        cursor.execute("INSERT INTO player_game (cardgame_id, player_id, initial_card_id, initial_card_deck_id,"
+                       "starting_points, ending_points) VALUES (%s, %s, %s, %s, %s, %s)",
+                       (cardgame_id, dni, player_game[cardgame_id][dni]["initial_card_id"],
+                        player_game[cardgame_id][dni]["initial_card_deck_id"],
+                        player_game[cardgame_id][dni]["starting_points"],
+                        player_game[cardgame_id][dni]["ending_points"]))
+        cnx.commit()
 
 
-def fill_player_game_round(player_game_round,round,*fields):
-    print("hola")
+def fill_player_game_round(player_game_round,gameID,round,fields):
+    if player_game_round == {}:
+        player_game_round[gameID] = {}
+        if player_game_round[gameID] == {}:
+            player_game_round[gameID][round] = {}
+    elif round not in player_game_round[gameID]:
+        next_round = {round:{}}
+        player_game_round[gameID].update(next_round)
+    if len(player_game_round[gameID][round]) == 0:
+        for i in range(len(datos.game)):
+            round_dict = {datos.game[i]: {"is_bank": 0, "bet_points": 0, "cards_value": 0,
+                                                          "starting_round_points": 0, "ending_round_points": 0}}
+            player_game_round[gameID][round].update(round_dict)
+    for dni in player_game_round[gameID][round]:
+        if datos.players[dni]["bank"]:
+            player_game_round[gameID][round][dni]["is_bank"] = 1
+        player_game_round[gameID][round][dni]["bet_points"] = datos.players[dni]["bet"]
+        player_game_round[gameID][round][dni]["cards_value"] = datos.players[dni]["roundPoints"]
+        player_game_round[gameID][round][dni][fields] = datos.players[dni]["points"]
+
+
+def insertBBDD_player_game_round(player_game_round,cardgame_id):
+    cnx = mysql.connector.connect(user = "root", password = "1234",
+                                  host = "127.0.0.1",
+                                  database = "seven_half")
+    cursor = cnx.cursor()
+    for rounds in player_game_round[cardgame_id]:
+        for dni in player_game_round[cardgame_id][rounds]:
+            cursor.execute("INSERT INTO player_game_round "
+                           "(cardgame_id, round_num, player_id, is_bank, bet_points, cards_value,"
+                           "starting_round_points, ending_round_points) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                           (cardgame_id, rounds, dni, player_game_round[cardgame_id][rounds][dni]["is_bank"],
+                            player_game_round[cardgame_id][rounds][dni]["bet_points"],
+                            player_game_round[cardgame_id][rounds][dni]["cards_value"],
+                            player_game_round[cardgame_id][rounds][dni]["starting_round_points"],
+                            player_game_round[cardgame_id][rounds][dni]["ending_round_points"]))
+            cnx.commit()
 
 
 def getBBDDRanking():
-    #Función que crea la vista player_earnings, y retorna un diccionario con los datos de ésta,
     #  player_id | earnings | games_played | minutes_played
     dict_datos = {}
     cnx = mysql.connector.connect(user="root", password="1234",

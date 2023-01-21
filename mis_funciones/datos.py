@@ -110,12 +110,9 @@ cartas = {"spanish":{
     "T0K": {"literal": "Rey de Treboles", "value": 13, "priority": 1, "realValue": 0.5}
     }}
 
-# Prioridad Poker - Españolas//Diamantes = oros, corazones = copas, picas = espadas, tréboles = bastos
-
 # Diccionario de jugadores
 players = {}
 
-# Provisional///
 # Lista <game> donde irán los NIF de todos los jugadores que participan en la partida en cada momento
 game = []
 
@@ -129,11 +126,7 @@ context_game = {"players": players, "game": game, "mazo": "", "maxRounds": 0}
 cardgame = {"cardgame_id": 0, "players": 0, "start_hour": "hora inicio partida(datetime)", "rounds": 0,
             "end_hour": "hora final de partida (datetime)"}
 player_game = {}
-player_game_round = {"id_round": {"id_player_1":{"is_bank": " 0 o 1", "bet_points": "apuesta en la ronda",
-                                              "starting_round_points": "puntos al inicio de partida",
-                                              "cards_value": "puntos obtenidos en la actual ronda",
-                                              "ending_round_points": "puntos al final de la ronda"}}}
-# ///Provisional
+player_game_round = {}
 
 letrasDni = ["T","R","W","A","G","M","Y","F","P","D","X","B","N",
              "J","Z","S","Q","V","H","L","C","K","E"]
