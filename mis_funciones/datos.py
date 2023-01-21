@@ -123,12 +123,12 @@ game = []
 mazo = []
 
 # Diccionario donde tendremos una serie de variables de contexto a las que podremos acceder desde cualquier sitio
-context_game = {"players": players, "game": game, "mazo": ""}
+context_game = {"players": players, "game": game, "mazo": "", "maxRounds": 0}
 
 # Diccionarios para las tablas de BBDD que hay que actualizar durante el juego
 cardgame = {"cardgame_id": 0, "players": 0, "start_hour": "hora inicio partida(datetime)", "rounds": 0,
             "end_hour": "hora final de partida (datetime)"}
-player_game = {"id_game":{"id_player_1":{"initial_card_id": "card id", "starting_points": 0, "ending_points": 0}}}
+player_game = {}
 player_game_round = {"id_round": {"id_player_1":{"is_bank": " 0 o 1", "bet_points": "apuesta en la ronda",
                                               "starting_round_points": "puntos al inicio de partida",
                                               "cards_value": "puntos obtenidos en la actual ronda",
@@ -166,6 +166,17 @@ titulo_01 = "*"*140+"""
                                                                  __/ |                 
                                                                 |___/ """+"\n"+\
     "*"*140+"\n"
+
+titulo_011 = "*"*140+"""
+  ___       _      _   _   _                  ______ ______ ______ ______  ______  _                           
+ / _ \     | |    | | | \ | |                 | ___ \| ___ \|  _  \|  _  \ | ___ \| |                          
+/ /_\ \  __| |  __| | |  \| |  ___ __      __ | |_/ /| |_/ /| | | || | | | | |_/ /| |  __ _  _   _   ___  _ __ 
+|  _  | / _` | / _` | | . ` | / _ \\ \ /\ / / | ___ \| ___ \| | | || | | | |  __/ | | / _` || | | | / _ \| '__|
+| | | || (_| || (_| | | |\  ||  __/ \ V  V /  | |_/ /| |_/ /| |/ / | |/ /  | |    | || (_| || |_| ||  __/| |   
+\_| |_/ \__,_| \__,_| \_| \_/ \___|  \_/\_/   \____/ \____/ |___/  |___/   \_|    |_| \__,_| \__, | \___||_|   
+                                                                                              __/ |            
+                                                                                             |___/"""+"\n"+"*"*140+"\n"
+
 
 titulo_02 = "*"*140+"""
                                               _____        _    _    _                    

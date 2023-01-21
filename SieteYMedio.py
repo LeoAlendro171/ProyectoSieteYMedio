@@ -49,6 +49,9 @@ while not datos.Salir:
         if option == 1:
             funciones.clear()
             funciones.setNewPlayer()
+        elif option == 2:
+            funciones.clear()
+            funciones.setNewPlayer(False)
         elif option == 3:
             funciones.clear()
             funciones.removeBBDDPlayer()

@@ -1,5 +1,5 @@
 import mysql.connector
-
+import time
 from . import datos
 import random
 import _mysql_connector
@@ -46,7 +46,13 @@ def roundHeader(playerId):
 
 def playGame():
     resetPoints()
+    game_id = getGameId()
+    datos.cardgame["cardgame_id"] = game_id
+    datos.cardgame["players"] = len(datos.game)
+    datos.cardgame["start_hour"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    print(datos.cardgame)
     setGamePriority(datos.mazo)
+    fill_player_game(datos.player_game,game_id,"starting_points")
     orderAllPlayers()
     for i in range(datos.maxRounds):
         setBets()
@@ -64,13 +70,30 @@ def playGame():
         checkMinimum2PlayersWithPoints()
         orderAllPlayers()
         datos.maxRounds -= 1
+        if datos.maxRounds <= 0:
+            break
     printWinner()
+    datos.cardgame["rounds"] = datos.ronda
+    datos.cardgame["end_hour"] = time.strftime("%Y-%m-%d %H:%M:%S")
+    fill_player_game(datos.player_game, game_id, "ending_points")
+    insertBBDDCardgame(datos.cardgame)
     datos.maxRounds = 5
     datos.ronda = 0
     datos.flg_03 = False
     datos.flg_00 = True
     return
 
+
+def insertBBDDCardgame(cardgame):
+    cnx = mysql.connector.connect(user = "root", password = "1234",
+                                  host = "127.0.0.1",
+                                  database = "seven_half")
+    cursor = cnx.cursor()
+    cursor.execute("INSERT INTO cardgame (cardgame_id, players, rounds, start_hour, end_hour)"\
+                   "VALUES (%s, %s, %s, %s, %s)",
+                   (cardgame["cardgame_id"],cardgame["players"], cardgame["rounds"],
+                    cardgame["start_hour"], cardgame["end_hour"]))
+    cnx.commit()
 
 def setGamePriority(mazo):
     random.shuffle(mazo)
@@ -106,7 +129,6 @@ def setGamePriority(mazo):
         datos.players[datos.game[i]]["priority"] = i + 1
         if datos.players[datos.game[i]]["priority"] == len(datos.game):
             datos.players[datos.game[i]]["bank"] = True
-        print(datos.players[datos.game[i]])
         datos.players[datos.game[i]]["roundPoints"] = 0
         random.shuffle(mazo)
 
@@ -124,8 +146,10 @@ def checkMinimum2PlayersWithPoints():
         if datos.players[dni]["points"] == 0:
             two_players -= 1
     if two_players < 2:
-        print("Not enough players with points")
+        print(center_string("Not enough players with points"))
+        input(center_string("Enter to continue"))
         datos.maxRounds = 0
+        return datos.maxRounds
 
 
 def orderAllPlayers(order="asc"):
@@ -528,13 +552,20 @@ def newPlayer(dni, name, profile, human):
 
 def randomNIF():
     nif = ""
-    for i in range(7):
-        nif += str(random.randint(1,9))
+    for i in range(8):
+        nif += str(random.randint(0, 9))
+    if int(nif) % 23 in range(len(datos.letrasDni)):
+        nif += datos.letrasDni[int(nif) % 23]
+        if nif not in datos.players:
+            return nif
+        else:
+            randomNIF()
 
 
 def setNewPlayer(human = True):
     while True:
         try:
+            print(datos.titulo_011)
             notbot = 0
             name = input(datos.space+"Name: ")
             if not name.isalpha():
@@ -548,7 +579,7 @@ def setNewPlayer(human = True):
                 elif dni in datos.players:
                     raise ValueError(datos.space + "NIF {} already exists".format(dni))
             elif not human:
-                print("hola")
+                dni = randomNIF()
             textOps = datos.space+"Select your Profile:\n"+\
                       datos.space+"1)Cautious\n"+\
                       datos.space+"2)Moderated\n"+\
@@ -585,6 +616,8 @@ def setNewPlayer(human = True):
                                "VALUES ('{}','{}',{},{})".format(dni,name,profile,notbot))
                 cnx.commit()
                 getPlayers()
+                print(center_string("New player added to the BBDD"))
+                input(center_string("Enter to continue"))
                 return
 
 
@@ -663,14 +696,6 @@ def setPlayersGame():
                 players_data += "".ljust(20) + "".ljust(20) + "".ljust(20)
         players_data += "\n"
     print(players_data)
-    # Provisional ////
-    # text = datos.space+"Enter ID to add a player to the game\n"+\
-    #       datos.space+"Enter -ID to remove a player from the game\n"+\
-    #       datos.space+"Enter sh to show actual players in game\n"+\
-    #       datos.space+"Enter -1 to exit\n"
-    # option_text = datos.space + "Option: "
-    # option_range = [datos.players]
-    # //// Provisional
     option = input(datos.space+"Enter ID to add a player to the game\n"+\
           datos.space+"Enter -ID to remove a player from the game\n"+\
           datos.space+"Enter sh to show actual players in game\n"+\
@@ -695,6 +720,7 @@ def setPlayersGame():
     else:
         print("Invalid option".center(140,"*"))
         input(center_string("Enter to continue"))
+
 
 def removeBBDDPlayer():
     print(datos.titulo_021)
@@ -758,11 +784,12 @@ def removeBBDDPlayer():
                 cnx.commit()
                 datos.players.pop(option.lstrip("-"))
                 getPlayers()
+                print(center_string("Player {} removed from the BBDD".format(option.lstrip("-"))))
+                input(center_string("Enter to continue"))
                 clear()
                 removeBBDDPlayer()
         except ValueError as e:
             print(e)
-
 
 
 def showPlayersGame():
@@ -820,7 +847,7 @@ def setCardsDeck():
     exception = [0]
     option = getOpt(textOps,inputOptText,range_list,exception)
     if option == 1:
-        datos.context_game["mazo"] = "ESP"
+        datos.context_game["mazo"] = "spanish"
         for ids in datos.cartas["spanish"]:
             datos.mazo += [ids]
         print(datos.space+"Deck set to Spanish deck")
@@ -836,9 +863,25 @@ def setCardsDeck():
     return datos.mazo
 
 
-def fill_player_game(player_game,gameID,*fields):
-    print("hola")
+def fill_player_game(player_game,gameID,fields):
+    player_game[gameID] = {}
+    for i in range(len(datos.game)):
+        player_game[gameID] = {datos.game[i]: {}}
+        if datos.context_game["mazo"] == "spanish":
+            player_game[gameID][datos.game[i]] = {"initial_card_id": "",
+                                                  "initial_card_deck_id": "ESP",
+                                                  "starting_points": 20, "ending_points": 0}
+        elif datos.context_game["mazo"] == "poker":
+            player_game[gameID][datos.game[i]] = {"initial_card_id": "",
+                                                  "initial_card_deck_id": "POK",
+                                                  "starting_points": 20, "ending_points": 0}
+        player_game[gameID][datos.game[i]]["initial_card_id"] = datos.players[datos.game[i]]["initialCard"]
+        player_game[gameID][datos.game[i]][fields] = datos.players[datos.game[i]]["points"]
 
+
+def insertBBDD_player_game(player_game,cardgame_id):
+    for dni in datos.game:
+        print("hola")
 
 
 def fill_player_game_round(player_game_round,round,*fields):
@@ -852,18 +895,18 @@ def getBBDDRanking():
     cnx = mysql.connector.connect(user="root", password="1234",
                                   host="127.0.0.1",
                                   database="seven_half")
-    query = "drop view if exists player_earnings"
+    query = "drop view if exists ranking"
     cursor = cnx.cursor()
     cursor.execute(query)
     cnx.commit()
-    query = "create view player_earnings as select pg.player_id AS player_id, " \
+    query = "create view ranking as select pg.player_id AS player_id, " \
             "sum((pg.ending_points - pg.starting_points)) AS earnings, count(pg.cardgame_id) AS games_played, " \
             "sum(timestampdiff(SECOND,c.start_hour,c.end_hour)) / 60 AS minutes_played from player_game pg " \
             "join cardgame c on pg.cardgame_id = c.cardgame_id group by pg.player_id"
     cursor = cnx.cursor()
     cursor.execute(query)
     cnx.commit()
-    query = "SELECT * FROM player_earnings"
+    query = "SELECT * FROM ranking"
     cursor.execute(query)
     info = cursor.fetchall()
     for player in info:
@@ -872,6 +915,19 @@ def getBBDDRanking():
         dict_datos[player[0]]["games_played"] = int(player[2])
         dict_datos[player[0]]["minutes_played"] = float(player[3])
     return dict_datos
+
+
+def getGameId():
+    cnx = mysql.connector.connect(user="root", password="1234",
+                                  host="127.0.0.1",
+                                  database="seven_half")
+    cursor = cnx.cursor()
+    cursor.execute("SELECT cardgame_id from cardgame")
+    id_game = 0
+    for ids in cursor:
+        for values in ids:
+            id_game = values + 1
+    return id_game
 
 
 
