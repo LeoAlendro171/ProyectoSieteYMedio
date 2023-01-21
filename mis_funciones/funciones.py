@@ -1041,40 +1041,18 @@ def reports():
     cnx = mysql.connector.connect(user="root", password="1234",
                                   host="127.0.0.1",
                                   database="seven_half")
-    textOpts = datos.space + "1)Initial card more repeated by each user,\n" + datos.space + \
-               "only users who have played a minimum of 3 games" \
-               + "\n" + datos.space + "2)Player who makes the highest bet per game,\n" + datos.space + \
-               "find the round with the highest bet" + \
-               "\n" + datos.space + "3)Player who makes the lowest bet per game" \
-               + "\n" + datos.space + "4)Percentage of rounds won per player in each game\n" + datos.space + "(%)," \
-                                    "as well as their average bet for the game" \
-               + "\n" + datos.space + "5)List of games won by Bots" \
-               + "\n" + datos.space + "6)Rounds won by the bank in each game" \
-               + "\n" + datos.space + "7)Number of users that have been the bank in each game" \
-               + "\n" + datos.space + "8)Average bet per game" \
-               + "\n" + datos.space + "9)Average bet of the first round of each game" \
-               + "\n" + datos.space + "10)Average bet of the last round of each game" \
-               + "\n" + datos.space + "11)Go back"
+    textOpts = datos.space + "1)Number of users that have been the bank in each game" \
+               + "\n" + datos.space + "2)Average bet per game" \
+               + "\n" + datos.space + "3)Average bet of the first round of each game" \
+               + "\n" + datos.space + "4)Average bet of the last round of each game" \
+               + "\n" + datos.space + "5)Go back"
     inputOptText = datos.space + "Option: "
-    option_range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    exception = [11]
+    option_range = [1, 2, 3, 4]
+    exception = [5]
     option = getOpt(textOpts, inputOptText, option_range, exception)
     dict_datos = {}
     keys = []
     if option == 1:
-        highest_bet = "select * " \
-                 + "from (select p.cardgame_id,p.player_id,max(p.bet_points) as max_bet from player_game_round p " \
-                 + "where p.bet_points is not null group by 1,2) pb where pb.max_bet = (select max(p1.bet_points) from "\
-                 + "player_game_round p1 where p1.cardgame_id=pb.cardgame_id);"
-        cursor = cnx.cursor()
-        cursor.execute(highest_bet)
-        info = cursor.fetchall()
-        for cardgame in info:
-            dict_datos[cardgame[0]] = {}
-            dict_datos[cardgame[0]]["player_id"] = cardgame[1]
-            dict_datos[cardgame[0]]["max_bet"] = int(cardgame[2])
-        print(dict_datos)
-    elif option == 2:
         bank_players = "select p.cardgame_id,count(distinct player_id) as bancas from player_game_round p "\
                      + "where p.is_bank is true group by 1;"
         cursor = cnx.cursor()
@@ -1106,7 +1084,112 @@ def reports():
                 else:
                     contador = 1
         input(center_string("Enter to continue"))
-    if option == 11:
+    elif option == 2:
+        average_bet = "select p.cardgame_id,avg(p.bet_points) as apuesta_media_partida " \
+                      "from player_game_round p group by 1;"
+        cursor = cnx.cursor()
+        cursor.execute(average_bet)
+        info = cursor.fetchall()
+        for cardgame in info:
+            dict_datos[cardgame[0]] = {}
+            dict_datos[cardgame[0]]["bet"] = float(cardgame[1])
+        header = datos.space+"-"*45+"\n"+\
+                 datos.space+"Cardgame".center(20) + \
+                 "Average Bet".center(30)+"\n"+\
+                 datos.space+"-"*45
+        info = ""
+        for cardgame in dict_datos:
+            keys.append(cardgame)
+        contador = 1
+        for i in range(len(keys)):
+            clear()
+            print(datos.titulo_05)
+            print(header)
+            contador += 1
+            info += datos.space+str(keys[i]).center(20) + str(dict_datos[keys[i]]["bet"]).center(30) + "\n"
+            if contador == 10:
+                print(info)
+                info = ""
+                keep_going = input(datos.space+"+ to show more, any other key to stop: ")
+                if keep_going != "+":
+                    break
+                else:
+                    contador = 1
+        input(center_string("Enter to continue"))
+    elif option == 3:
+        round_bet = "select p.cardgame_id,p.round_num,avg(p.bet_points) as apuesta_media_primera_ronda_partida " \
+                    + "from player_game_round p where p.round_num=1 group by 1,2;"
+        cursor = cnx.cursor()
+        cursor.execute(round_bet)
+        info = cursor.fetchall()
+        for cardgame in info:
+            dict_datos[cardgame[0]] = {}
+            dict_datos[cardgame[0]]["round"] = int(cardgame[1])
+            dict_datos[cardgame[0]]["bet"] = float(cardgame[2])
+        header = datos.space+"-"*45+"\n"+\
+                 datos.space+"Cardgame".center(15) + \
+                 "Round".center(15) + \
+                 "Average Bet".center(15)+"\n"+\
+                 datos.space+"-"*45
+        info = ""
+        for cardgame in dict_datos:
+            keys.append(cardgame)
+        contador = 1
+        for i in range(len(keys)):
+            clear()
+            print(datos.titulo_05)
+            print(header)
+            contador += 1
+            info += datos.space+str(keys[i]).center(15) + \
+                    str(dict_datos[keys[i]]["round"]).center(15) + \
+                    str(dict_datos[keys[i]]["bet"]).center(15) + "\n"
+            if contador == 10:
+                print(info)
+                info = ""
+                keep_going = input(datos.space+"+ to show more, any other key to stop: ")
+                if keep_going != "+":
+                    break
+                else:
+                    contador = 1
+        input(center_string("Enter to continue"))
+    elif option == 4:
+        round_bet = "select p.cardgame_id,p.round_num,avg(p.bet_points) as last_round_game_average_bet " \
+    +"from player_game_round p where p.round_num=(select c.rounds from cardgame c where c.cardgame_id=p.cardgame_id) "\
+                    + "group by 1,2;"
+        cursor = cnx.cursor()
+        cursor.execute(round_bet)
+        info = cursor.fetchall()
+        for cardgame in info:
+            dict_datos[cardgame[0]] = {}
+            dict_datos[cardgame[0]]["round"] = int(cardgame[1])
+            dict_datos[cardgame[0]]["bet"] = float(cardgame[2])
+        header = datos.space+"-"*45+"\n"+\
+                 datos.space+"Cardgame".center(15) + \
+                 "Round".center(15) + \
+                 "Average Bet".center(15)+"\n"+\
+                 datos.space+"-"*45
+        info = ""
+        for cardgame in dict_datos:
+            keys.append(cardgame)
+        contador = 1
+        for i in range(len(keys)):
+            clear()
+            print(datos.titulo_05)
+            print(header)
+            contador += 1
+            info += datos.space+str(keys[i]).center(15) + \
+                    str(dict_datos[keys[i]]["round"]).center(15) + \
+                    str(dict_datos[keys[i]]["bet"]).center(15) + "\n"
+            if contador == 10:
+                print(info)
+                info = ""
+                keep_going = input(datos.space+"+ to show more, any other key to stop: ")
+                if keep_going != "+":
+                    break
+                else:
+                    contador = 1
+        input(center_string("Enter to continue"))
+    elif option == 5:
         clear()
         datos.flg_05 = False
         datos.flg_00 = True
