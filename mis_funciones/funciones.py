@@ -261,14 +261,14 @@ def printWinner():
         for i in range(len(datos.game)-1):
             for j in range(len(datos.game)-i-1):
                 if datos.players[datos.game[j]]["points"] < datos.players[datos.game[j+1]]["points"]:
-                    print(datos.game[j],datos.players[datos.game[j]]["points"],
-                          datos.game[j+1],datos.players[datos.game[j+1]]["points"])
                     aux = datos.game[j]
                     datos.game[j] = datos.game[j+1]
                     datos.game[j+1] = aux
                 elif datos.players[datos.game[j]]["points"] == datos.players[datos.game[j+1]]["points"]:
                     if datos.players[datos.game[j]]["priority"] > datos.players[datos.game[j+1]]["priority"]:
-                        print("hola?")
+                        aux = datos.game[j]
+                        datos.game[j] = datos.game[j + 1]
+                        datos.game[j + 1] = aux
                 winner = datos.game[j]
     print(center_string("The winner is {} - {}, "
                         "in {} rounds, with {} points").format(winner,
@@ -941,24 +941,21 @@ def insertBBDD_player_game_round(player_game_round,cardgame_id):
 
 
 def getBBDDRanking():
-    #  player_id | earnings | games_played | minutes_played
     dict_datos = {}
     cnx = mysql.connector.connect(user="root", password="1234",
                                   host="127.0.0.1",
                                   database="seven_half")
-    query = "drop view if exists ranking"
     cursor = cnx.cursor()
-    cursor.execute(query)
+    cursor.execute("drop view if exists ranking")
     cnx.commit()
-    query = "create view ranking as select pg.player_id AS player_id, " \
+    st_ranking = "create view ranking as select pg.player_id AS player_id, " \
             "sum((pg.ending_points - pg.starting_points)) AS earnings, count(pg.cardgame_id) AS games_played, " \
             "sum(timestampdiff(SECOND,c.start_hour,c.end_hour)) / 60 AS minutes_played from player_game pg " \
             "join cardgame c on pg.cardgame_id = c.cardgame_id group by pg.player_id"
     cursor = cnx.cursor()
-    cursor.execute(query)
+    cursor.execute(st_ranking)
     cnx.commit()
-    query = "SELECT * FROM ranking"
-    cursor.execute(query)
+    cursor.execute("SELECT * FROM ranking")
     info = cursor.fetchall()
     for player in info:
         dict_datos[player[0]]={}
@@ -966,6 +963,31 @@ def getBBDDRanking():
         dict_datos[player[0]]["games_played"] = int(player[2])
         dict_datos[player[0]]["minutes_played"] = float(player[3])
     return dict_datos
+
+
+def ranking():
+    textOpts = datos.space + "1)Players With More Earnings" + "\n" + \
+               datos.space + "2)Players With More Games Played"+"\n" + \
+               datos.space + "3)Players With More Minutes Played" + "\n" + \
+               datos.space + "4)Go Back"
+    inputOptText = datos.space + "Option: "
+    option_range = [1, 2, 3]
+    exception = [4]
+    option = getOpt(textOpts, inputOptText, option_range, exception)
+    clear()
+    if option == 1:
+        print(datos.titulo_earnings)
+        returnListRanking()
+    elif option == 2:
+        print(datos.titulo_games_played)
+        returnListRanking("games_played")
+    elif option == 3:
+        print(datos.titulo_minutes_played)
+        returnListRanking("minutes_played")
+    elif option == 4:
+        clear()
+        datos.flg_04 = False
+        datos.flg_00 = True
 
 
 def getGameId():
@@ -979,6 +1001,115 @@ def getGameId():
         for values in ids:
             id_game = values + 1
     return id_game
+
+
+def returnListRanking(field="earnings"):
+    dict_datos = getBBDDRanking()
+    players = []
+    for dni in dict_datos:
+        players.append(dni)
+    for i in range(len(players) - 1):
+        for j in range(len(players) - i - 1):
+            if dict_datos[players[j]][field] < dict_datos[players[j + 1]][field]:
+                aux = players[j]
+                players[j] = players[j + 1]
+                players[j + 1] = aux
+    info = ""
+    header = center_string("TOP TEN PLAYERS") + "\n" + \
+             datos.space + "-" * 45 + "\n" + \
+             datos.space + "Player ID".ljust(15)
+    if field == "earnings":
+        header += "Name".ljust(20)+"Earnings".ljust(10) + "\n"
+    elif field == "games_played":
+        header += "Name".ljust(18)+"Games Played".ljust(10) + "\n"
+    elif field == "minutes_played":
+        header += "Name".ljust(16)+"Minutes Played".ljust(10) + "\n"
+    header += datos.space + "-" * 45
+    for i in range(len(players)):
+        info += datos.space + players[i].ljust(15) + \
+                datos.players[players[i]]["name"].ljust(20) + \
+                str(dict_datos[players[i]][field]).center(8) + "\n"
+        if i == 9:
+            break
+    print(header)
+    print(info)
+    input(center_string("Enter to continue"))
+    clear()
+
+
+def reports():
+    cnx = mysql.connector.connect(user="root", password="1234",
+                                  host="127.0.0.1",
+                                  database="seven_half")
+    textOpts = datos.space + "1)Initial card more repeated by each user,\n" + datos.space + \
+               "only users who have played a minimum of 3 games" \
+               + "\n" + datos.space + "2)Player who makes the highest bet per game,\n" + datos.space + \
+               "find the round with the highest bet" + \
+               "\n" + datos.space + "3)Player who makes the lowest bet per game" \
+               + "\n" + datos.space + "4)Percentage of rounds won per player in each game\n" + datos.space + "(%)," \
+                                    "as well as their average bet for the game" \
+               + "\n" + datos.space + "5)List of games won by Bots" \
+               + "\n" + datos.space + "6)Rounds won by the bank in each game" \
+               + "\n" + datos.space + "7)Number of users that have been the bank in each game" \
+               + "\n" + datos.space + "8)Average bet per game" \
+               + "\n" + datos.space + "9)Average bet of the first round of each game" \
+               + "\n" + datos.space + "10)Average bet of the last round of each game" \
+               + "\n" + datos.space + "11)Go back"
+    inputOptText = datos.space + "Option: "
+    option_range = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    exception = [11]
+    option = getOpt(textOpts, inputOptText, option_range, exception)
+    dict_datos = {}
+    keys = []
+    if option == 1:
+        highest_bet = "select * " \
+                 + "from (select p.cardgame_id,p.player_id,max(p.bet_points) as max_bet from player_game_round p " \
+                 + "where p.bet_points is not null group by 1,2) pb where pb.max_bet = (select max(p1.bet_points) from "\
+                 + "player_game_round p1 where p1.cardgame_id=pb.cardgame_id);"
+        cursor = cnx.cursor()
+        cursor.execute(highest_bet)
+        info = cursor.fetchall()
+        for cardgame in info:
+            dict_datos[cardgame[0]] = {}
+            dict_datos[cardgame[0]]["player_id"] = cardgame[1]
+            dict_datos[cardgame[0]]["max_bet"] = int(cardgame[2])
+        print(dict_datos)
+    elif option == 2:
+        bank_players = "select p.cardgame_id,count(distinct player_id) as bancas from player_game_round p "\
+                     + "where p.is_bank is true group by 1;"
+        cursor = cnx.cursor()
+        cursor.execute(bank_players)
+        info = cursor.fetchall()
+        for cardgame in info:
+            dict_datos[cardgame[0]] = {}
+            dict_datos[cardgame[0]]["bancas"] = cardgame[1]
+        header = datos.space+"-"*45+"\n"+\
+                 datos.space+"Cardgame".center(20) + \
+                 "Bank Players".center(30)+"\n"+\
+                 datos.space+"-"*45
+        info = ""
+        for cardgame in dict_datos:
+            keys.append(cardgame)
+        contador = 1
+        for i in range(len(keys)):
+            clear()
+            print(datos.titulo_05)
+            print(header)
+            contador += 1
+            info += datos.space+str(keys[i]).center(20) + str(dict_datos[keys[i]]["bancas"]).center(30) + "\n"
+            if contador == 10:
+                print(info)
+                info = ""
+                keep_going = input(datos.space+"+ to show more, any other key to stop: ")
+                if keep_going != "+":
+                    break
+                else:
+                    contador = 1
+        input(center_string("Enter to continue"))
+    if option == 11:
+        clear()
+        datos.flg_05 = False
+        datos.flg_00 = True
 
 
 
