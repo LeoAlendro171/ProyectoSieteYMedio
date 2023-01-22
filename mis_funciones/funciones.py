@@ -5,9 +5,9 @@ import random
 import _mysql_connector
 
 def prueba():
-    cnx = mysql.connector.connect(user = "root", password = "1234",
-                                host = "127.0.0.1",
-                                database = "seven_half")
+    cnx = mysql.connector.connect(user = "alex171", password = "setimig",
+                                host = "20.251.14.239",
+                                database = "siete_y_medio")
 def center_string(string, width=140):
     spaces = (width - len(string)) // 2
     centered_string = " " * spaces + string + " " * spaces
@@ -15,9 +15,9 @@ def center_string(string, width=140):
 
 
 def getPlayers():
-    cnx = mysql.connector.connect(user = "root", password = "1234",
-                                  host = "127.0.0.1",
-                                  database = "seven_half")
+    cnx = mysql.connector.connect(user = "alex171", password = "setimig",
+                                  host = "20.251.14.239",
+                                  database = "siete_y_medio")
     cursor = cnx.cursor()
     cursor.execute("SELECT * from player")
     for table_name in cursor:
@@ -92,9 +92,9 @@ def playGame():
 
 
 def insertBBDDCardgame(cardgame):
-    cnx = mysql.connector.connect(user = "root", password = "1234",
-                                  host = "127.0.0.1",
-                                  database = "seven_half")
+    cnx = mysql.connector.connect(user = "alex171", password = "setimig",
+                                  host = "20.251.14.239",
+                                  database = "siete_y_medio")
     cursor = cnx.cursor()
     cursor.execute("INSERT INTO cardgame (cardgame_id, players, rounds, start_hour, end_hour)"\
                    "VALUES (%s, %s, %s, %s, %s)",
@@ -611,9 +611,9 @@ def setNewPlayer(human = True):
             if not confirmation.lower() == "y":
                 return
             else:
-                cnx = mysql.connector.connect(user="root", password="1234",
-                                              host="127.0.0.1",
-                                              database="seven_half")
+                cnx = mysql.connector.connect(user="alex171", password="setimig",
+                                              host="20.251.14.239",
+                                              database="siete_y_medio")
                 cursor = cnx.cursor()
                 cursor.execute("INSERT INTO player (player_id, player_name, player_risk,human) "
                                "VALUES ('{}','{}',{},{})".format(dni,name,profile,notbot))
@@ -779,9 +779,9 @@ def removeBBDDPlayer():
             elif option.lstrip("-") not in datos.players:
                 raise ValueError(datos.space+"Invalid Option")
             else:
-                cnx = mysql.connector.connect(user="root", password="1234",
-                                              host="127.0.0.1",
-                                              database="seven_half")
+                cnx = mysql.connector.connect(user="alex171", password="setimig",
+                                              host="20.251.14.239",
+                                              database="siete_y_medio")
                 cursor = cnx.cursor()
                 cursor.execute("DELETE from player WHERE player_id = '{}'".format(option.lstrip("-")))
                 cnx.commit()
@@ -887,9 +887,9 @@ def fill_player_game(player_game,gameID,fields):
 
 
 def insertBBDD_player_game(player_game,cardgame_id):
-    cnx = mysql.connector.connect(user = "root", password = "1234",
-                                  host = "127.0.0.1",
-                                  database = "seven_half")
+    cnx = mysql.connector.connect(user = "alex171", password = "setimig",
+                                  host = "20.251.14.239",
+                                  database = "siete_y_medio")
     cursor = cnx.cursor()
     for dni in player_game[cardgame_id]:
         cursor.execute("INSERT INTO player_game (cardgame_id, player_id, initial_card_id, initial_card_deck_id,"
@@ -923,9 +923,9 @@ def fill_player_game_round(player_game_round,gameID,round,fields):
 
 
 def insertBBDD_player_game_round(player_game_round,cardgame_id):
-    cnx = mysql.connector.connect(user = "root", password = "1234",
-                                  host = "127.0.0.1",
-                                  database = "seven_half")
+    cnx = mysql.connector.connect(user = "alex171", password = "setimig",
+                                  host = "20.251.14.239",
+                                  database = "siete_y_medio")
     cursor = cnx.cursor()
     for rounds in player_game_round[cardgame_id]:
         for dni in player_game_round[cardgame_id][rounds]:
@@ -942,9 +942,9 @@ def insertBBDD_player_game_round(player_game_round,cardgame_id):
 
 def getBBDDRanking():
     dict_datos = {}
-    cnx = mysql.connector.connect(user="root", password="1234",
-                                  host="127.0.0.1",
-                                  database="seven_half")
+    cnx = mysql.connector.connect(user="alex171", password="setimig",
+                                  host="20.251.14.239",
+                                  database="siete_y_medio")
     cursor = cnx.cursor()
     cursor.execute("drop view if exists ranking")
     cnx.commit()
@@ -991,9 +991,9 @@ def ranking():
 
 
 def getGameId():
-    cnx = mysql.connector.connect(user="root", password="1234",
-                                  host="127.0.0.1",
-                                  database="seven_half")
+    cnx = mysql.connector.connect(user="alex171", password="setimig",
+                                  host="20.251.14.239",
+                                  database="siete_y_medio")
     cursor = cnx.cursor()
     cursor.execute("SELECT cardgame_id from cardgame")
     id_game = 0
@@ -1038,9 +1038,9 @@ def returnListRanking(field="earnings"):
 
 
 def reports():
-    cnx = mysql.connector.connect(user="root", password="1234",
-                                  host="127.0.0.1",
-                                  database="seven_half")
+    cnx = mysql.connector.connect(user="alex171", password="setimig",
+                                  host="20.251.14.239",
+                                  database="siete_y_medio")
     textOpts = datos.space + "1)Number of users that have been the bank in each game" \
                + "\n" + datos.space + "2)Average bet per game" \
                + "\n" + datos.space + "3)Average bet of the first round of each game" \
