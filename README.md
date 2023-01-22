@@ -6,7 +6,10 @@ Descargar los elementos necesarios:
 1 - El código para poder iniciar el juego.
 
 
-2 - La página web se encuentra en el directorio "PaginaWebSieteYMedio"
+2- Los elementos como la página web y los archivos de BBDD se encuentran en la carpeta "Proyecto7YMedio"
+
+
+3 - La página web se encuentra en el directorio "PaginaWebSieteYMedio"
 
 
 
