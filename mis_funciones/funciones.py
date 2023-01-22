@@ -1085,7 +1085,7 @@ def reports():
                     contador = 1
         input(center_string("Enter to continue"))
     elif option == 2:
-        average_bet = "select p.cardgame_id,avg(p.bet_points) as apuesta_media_partida " \
+        average_bet = "select p.cardgame_id,avg(p.bet_points) as average_bet " \
                       "from player_game_round p group by 1;"
         cursor = cnx.cursor()
         cursor.execute(average_bet)
@@ -1117,7 +1117,7 @@ def reports():
                     contador = 1
         input(center_string("Enter to continue"))
     elif option == 3:
-        round_bet = "select p.cardgame_id,p.round_num,avg(p.bet_points) as apuesta_media_primera_ronda_partida " \
+        round_bet = "select p.cardgame_id,p.round_num,avg(p.bet_points) as average_bet_first_round " \
                     + "from player_game_round p where p.round_num=1 group by 1,2;"
         cursor = cnx.cursor()
         cursor.execute(round_bet)
