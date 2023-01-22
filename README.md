@@ -3,7 +3,7 @@
 Descargar los elementos necesarios:
 
 
-1 - El código para poder iniciar el juego.
+1 - El código para poder iniciar el juego, que se encuentra en la carpeta "Proyecto"
 
 
 2- Los elementos como la página web y los archivos de BBDD se encuentran en la carpeta "Proyecto7YMedio"
